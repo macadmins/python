@@ -1,0 +1,2 @@
+-r pyobjc.txt
+-r xattr.txt
