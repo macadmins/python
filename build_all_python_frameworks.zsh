@@ -10,4 +10,4 @@ TOOLSDIR=$(dirname $0)
 sudo "$TOOLSDIR/build_python_framework_pkgs.zsh" minimal
 sudo "$TOOLSDIR/build_python_framework_pkgs.zsh" no_customization
 sudo "$TOOLSDIR/build_python_framework_pkgs.zsh" recommended
-sudo "$TOOLSDIR/build_python_framework_pkgs.zsh" opionated
+sudo "$TOOLSDIR/build_python_framework_pkgs.zsh" opinionated
