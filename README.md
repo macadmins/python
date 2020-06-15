@@ -1,5 +1,5 @@
 # python
-A Python framework that installs to `/Library/SystemFrameworks/Python.framework`.
+A Python 3 framework that currently installs to `/Library/SystemFrameworks/Python3.framework`.
 
 Please see Apple's documentation on [file system basics](https://developer.apple.com/library/archive/documentation/FileManagement/Conceptual/FileSystemProgrammingGuide/FileSystemOverview/FileSystemOverview.html) for more information on the thought process here.
 
