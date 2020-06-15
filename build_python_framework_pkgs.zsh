@@ -112,7 +112,7 @@ fi
 
 # move the framework to the Python package folder
 echo "Moving Python.framework to payload folder"
-/usr/bin/sudo /bin/mv "${FRAMEWORKDIR}/Python.framework" "$TOOLSDIR/$TYPE/payload/${FRAMEWORKDIR}"
+/usr/bin/sudo /bin/mv "${FRAMEWORKDIR}/Python.framework" "$TOOLSDIR/$TYPE/payload/${FRAMEWORKDIR}/Python3.framework"
 
 # take ownership of the payload folder
 echo "Taking ownership of the Payload directory"
@@ -154,7 +154,7 @@ JSONFILE
 "${MP_BINDIR}/munki-pkg-${MP_SHA}/munkipkg" "$TOOLSDIR/$TYPE"
 
 # Zip the framework
-ZIPFILE="Python.framework_$TYPE-$PYTHON_VERSION.$DATE.zip"
+ZIPFILE="Python3.framework_$TYPE-$PYTHON_VERSION.$DATE.zip"
 /usr/bin/ditto -c -k --sequesterRsrc "$TOOLSDIR/$TYPE/payload/${FRAMEWORKDIR}/" ${ZIPFILE}
 
 # Move all of the output files
