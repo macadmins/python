@@ -34,6 +34,17 @@ For more information on this method, please see Moving to Zsh Part [II](https://
 ## Notes
 To decrease complexity, only a _single_ package may be installed at any given time on a machine.
 
+### Upgrades
+While Python itself has it's own update cadence and dot release schedule, it is likely that this package will have many updates as 3rd party libraries release their own updates, bug fixes and security enhancements. These packages should not break your workflow, but you should test your scripts prior to wide deployment to your devices.
+
+### Downgrades
+Downgrades will not be supported by this repository.
+
+### pip
+While `pip` is bundled in this framework, it is **not recommended** to install any external libraries into your frameworks folder outside of what comes with the package. If you need to use or test external libraries not present in the package, it is recommended to use a virtual environment or a tool like [pyenv](https://github.com/pyenv/pyenv).
+
+Pull Requests can be issued to the `opionated` or `recommended` package, but more scrutiny will be applied to the `recommended` package.
+
 # Flavors of Python
 We currently offer four versions of Python. You can chose which version suits your needs.
 
