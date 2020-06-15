@@ -48,3 +48,10 @@ Tools that should work:
 
 # Updating packages
 This should be done in a clean virtual environment. After every python package install, you can run `pip freeze | xargs pip uninstall -y` to cleanup the environment.
+
+# Credits
+These packages are created with two other open source tools:
+- [relocatable-python](https://github.com/gregneagle/relocatable-python)
+- [munki-pkg](https://github.com/munki/munki-pkg)
+
+Both are written by [Greg Neagle](https://www.linkedin.com/in/gregneagle/). Thank you for your continued dedication to the macOS platform.
