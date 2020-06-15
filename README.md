@@ -1,5 +1,5 @@
 # python
-A Python framework that installs to `/Library/frameworks/Python.framework`.
+A Python framework that installs to `/Library/SystemFrameworks/Python.framework`.
 
 This is an intended replacement for when Apple removes `/usr/bin/python`
 
