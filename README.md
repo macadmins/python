@@ -5,6 +5,32 @@ Please see Apple's documentation on [file system basics](https://developer.apple
 
 This is an intended replacement for when Apple removes `/usr/bin/python`
 
+## Using interactively
+After installing any of the packages, a symbolic link can be used within terminal for interactive python sessions. At the time of this writing `/usr/local/bin/python3.framework` points to `/Library/SystemFrameworks/Python3.framework/Versions/3.8/bin/python3.8`
+
+## Using with scripts
+Careful consideration should be used when determining the best course of action for using with scripts. Due to various complexities, a shim file has been provided and is located at `/Library/SystemFrameworks/Python3.framework/python3`
+
+It is currently recommended to point directly to this shim as future updates to python3 could change this path.
+
+At the time of this writing `/Library/SystemFrameworks/Python3.framework/python3` points to `/Library/SystemFrameworks/Python3.framework/Versions/3.8/bin/python3.8`
+
+An example script would look like the following:
+
+```
+#!/Library/SystemFrameworks/Python3.framework/python3
+
+print('This is an example script.')
+```
+
+### Other options to consider
+#### zshenv global alias
+If you are calling python within zsh scripts, adding a global alias to `/etc/zshenv` may be appropriate.
+
+`alias -g python3.framework='/Library/SystemFrameworks/Python3.framework/python3'`
+
+For more information on this method, please see Moving to Zsh Part [II](https://scriptingosx.com/2019/06/moving-to-zsh-part-2-configuration-files/) and [IV](https://scriptingosx.com/2019/07/moving-to-zsh-part-4-aliases-and-functions/)
+
 ## Notes
 To decrease complexity, only a _single_ package may be installed at any given time on a machine.
 

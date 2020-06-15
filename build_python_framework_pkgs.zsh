@@ -9,6 +9,11 @@
 PYTHON_VERSION=3.8.3
 RP_SHA="8bce58e91895978da6f238c1d2e1de3559ea4643"
 MP_SHA="71c57fcfdf43692adcd41fa7305be08f66bae3e5"
+# Hardcoded paths
+FRAMEWORKDIR="/Library/SystemFrameworks"
+PYTHON_BIN="$FRAMEWORKDIR/Python3.framework/Versions/3.8/bin/python3.8"
+RP_BINDIR="/tmp/relocatable-python"
+MP_BINDIR="/tmp/munki-pkg"
 
 # Sanity Checks
 ## Type Check
@@ -54,10 +59,7 @@ DATE=$(/bin/date -u "+%m%d%Y%H%M%S")
 TOOLSDIR=$(dirname $0)
 OUTPUTSDIR="$TOOLSDIR/outputs"
 CONSOLEUSER=$(/usr/bin/stat -f "%Su" /dev/console)
-FRAMEWORKDIR="/Library/SystemFrameworks"
-RP_BINDIR="/tmp/relocatable-python"
 RP_ZIP="/tmp/relocatable-python.zip"
-MP_BINDIR="/tmp/munki-pkg"
 MP_ZIP="/tmp/munki-pkg.zip"
 echo "Creating Python Framework - $TYPE"
 
@@ -87,13 +89,15 @@ if [ "${DL_RESULT}" != "0" ]; then
     exit 1
 fi
 
-# remove existing Python package folder
+# remove existing Python package folders and recreate
 if [ -d "$TOOLSDIR/$TYPE" ]; then
     /bin/rm -rf "$TOOLSDIR/$TYPE"
     /bin/mkdir -p "$TOOLSDIR/$TYPE/payload/${FRAMEWORKDIR}"
+    /bin/mkdir -p "$TOOLSDIR/$TYPE/payload/usr/local/bin"
     /usr/bin/sudo /usr/sbin/chown -R ${CONSOLEUSER}:wheel "$TOOLSDIR/$TYPE"
 else
   /bin/mkdir -p "$TOOLSDIR/$TYPE/payload/${FRAMEWORKDIR}"
+  /bin/mkdir -p "$TOOLSDIR/$TYPE/payload/usr/local/bin"
   /usr/bin/sudo /usr/sbin/chown -R ${CONSOLEUSER}:wheel "$TOOLSDIR/$TYPE"
 fi
 
@@ -113,6 +117,10 @@ fi
 # move the framework to the Python package folder
 echo "Moving Python.framework to payload folder"
 /usr/bin/sudo /bin/mv "${FRAMEWORKDIR}/Python.framework" "$TOOLSDIR/$TYPE/payload/${FRAMEWORKDIR}/Python3.framework"
+
+# make a symbolic link to help with interactive use and stable path
+/bin/ln -s "$PYTHON_BIN" "$TOOLSDIR/$TYPE/payload/usr/local/bin/python3.framework"
+/bin/ln -s "$PYTHON_BIN" "$TOOLSDIR/$TYPE/payload/$FRAMEWORKDIR/Python3.framework/python3"
 
 # take ownership of the payload folder
 echo "Taking ownership of the Payload directory"
