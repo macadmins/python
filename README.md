@@ -36,7 +36,7 @@ Tools that should work:
 - nudge
 - UMAD
 
-## Opionated
+## Opinionated
 This is a Python.framework that contains everything from Recommended, and libraries that various open source projects require.
 
 This is a **kitchen sink** approach, opting for the latest known packages.
