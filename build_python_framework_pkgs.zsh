@@ -52,8 +52,9 @@ fi
 # Variables
 DATE=$(/bin/date -u "+%m%d%Y%H%M%S")
 TOOLSDIR=$(dirname $0)
+OUTPUTSDIR="$TOOLSDIR/outputs"
 CONSOLEUSER=$(/usr/bin/stat -f "%Su" /dev/console)
-FRAMEWORKDIR="/Library/frameworks"
+FRAMEWORKDIR="/Library/SystemFrameworks"
 RP_BINDIR="/tmp/relocatable-python"
 RP_ZIP="/tmp/relocatable-python.zip"
 MP_BINDIR="/tmp/munki-pkg"
@@ -133,6 +134,9 @@ if [ "${DL_RESULT}" != "0" ]; then
     exit 1
 fi
 
+# Create outputs folder
+/bin/mkdir -p "$TOOLSDIR/outputs"
+
 # Create the json file for munki-pkg
 /bin/cat << JSONFILE > "$TOOLSDIR/$TYPE/build-info.json"
 {
@@ -148,3 +152,15 @@ fi
 JSONFILE
 # Create the pkg
 "${MP_BINDIR}/munki-pkg-${MP_SHA}/munkipkg" "$TOOLSDIR/$TYPE"
+
+# Zip the framework
+ZIPFILE="Python.framework_$TYPE-$PYTHON_VERSION.$DATE.zip"
+/usr/bin/ditto -c -k --sequesterRsrc "$TOOLSDIR/$TYPE/payload/${FRAMEWORKDIR}/" ${ZIPFILE}
+
+# Move all of the output files
+/bin/mv ${ZIPFILE} "$OUTPUTSDIR"
+/bin/mv "$TOOLSDIR/$TYPE/build/python_$TYPE-$PYTHON_VERSION.$DATE.pkg" "$OUTPUTSDIR"
+/usr/bin/sudo /usr/sbin/chown -R ${CONSOLEUSER}:wheel "$OUTPUTSDIR"
+
+# Cleanup
+/usr/bin/sudo /bin/rm -rf "$TOOLSDIR/$TYPE"
