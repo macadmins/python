@@ -16,11 +16,11 @@ jobs:
     runs-on: macos-latest
 
     steps:
-    - name: Get duild bate
-      run: echo ::set-env name=BUILD_DATE::$(/bin/date -u \"+%m%d%Y%H%M%S\")
-
-    - name: Print build date
-      run: echo "${BUILD_DATE}"
+    - name: Set environment variables
+      id: set_env_var
+      run: |
+         echo ::set-env name=BUILD_DATE::$(/bin/date -u "+%m%d%Y%H%M%S")
+         echo ::set-env name=BUILD_DATE_RELEASE::$(/bin/date -u "+%B %d %Y")
 
     - name: Checkout python repo
       uses: actions/checkout@v2
@@ -39,10 +39,9 @@ jobs:
       uses: actions/create-release@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        DATE: "${{ steps.current-time.outputs.formattedTime }}"
       with:
-        tag_name: v${{ env.BUILD_DATE }}
-        release_name: Python ${{env.PYTHON_VERSION}} (${{ env.BUILD_DATE }})
+        tag_name: v.${{ steps.set_env_var.outputs.BUILD_DATE }}
+        release_name: Python ${{env.PYTHON_VERSION}} (${{ steps.set_env_var.outputs.BUILD_DATE_RELEASE }})
         draft: true
         prerelease: true
 
@@ -53,8 +52,8 @@ jobs:
         DATE: "${{ steps.current-time.outputs.formattedTime }}"
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./outputs/python_$TYPE-$PYTHON_VERSION.$DATE.pkg
-        asset_name: python_$TYPE-$PYTHON_VERSION.$DATE.pkg
+        asset_path: ./outputs/python_$TYPE-$PYTHON_VERSION.$BUILD_DATE.pkg
+        asset_name: python_$TYPE-$PYTHON_VERSION.$BUILD_DATE.pkg
         asset_content_type: application/x-newton-compatible-pkg
 
     - name: Upload Signed Package Release Asset
@@ -64,8 +63,8 @@ jobs:
         DATE: "${{ steps.current-time.outputs.formattedTime }}"
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./outputs/python_$TYPE_signed-$PYTHON_VERSION.$DATE.pkg
-        asset_name: python_$TYPE_signed-$PYTHON_VERSION.$DATE.pkg
+        asset_path: ./outputs/python_$TYPE_signed-$PYTHON_VERSION.$BUILD_DATE.pkg
+        asset_name: python_$TYPE_signed-$PYTHON_VERSION.$BUILD_DATE.pkg
         asset_content_type: application/x-newton-compatible-pkg
 
     - name: Upload Python Framework Release Asset
@@ -75,8 +74,8 @@ jobs:
         DATE: "${{ steps.current-time.outputs.formattedTime }}"
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./outputs/Python3.framework_$TYPE-$PYTHON_VERSION.$DATE.zip
-        asset_name: Python3.framework_$TYPE-$PYTHON_VERSION.$DATE.zip
+        asset_path: ./outputs/Python3.framework_$TYPE-$PYTHON_VERSION.$BUILD_DATE.zip
+        asset_name: Python3.framework_$TYPE-$PYTHON_VERSION.$BUILD_DATE.zip
         asset_content_type: application/zip
 
     - name: Upload packages
