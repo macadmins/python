@@ -84,6 +84,9 @@ Tools that should work when using the "Opinionated Flavor":
 # Updating packages
 This should be done in a clean virtual environment. After every Python package install, you can run `pip freeze | xargs pip uninstall -y` to cleanup the environment.
 
+# CI Job
+To update the certificate, run `base64 -i /path/to/certificate.p12 -o base64string` and import that into the github secrets store and update the password secret as well.
+
 # Credits
 These packages are created with two other open source tools:
 - [relocatable-python](https://github.com/gregneagle/relocatable-python)
