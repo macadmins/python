@@ -6,7 +6,6 @@
 # Run this with your current directory being the path where this script is located
 
 # Harcoded versions
-PYTHON_VERSION=3.8.3
 RP_SHA="8bce58e91895978da6f238c1d2e1de3559ea4643"
 MP_SHA="71c57fcfdf43692adcd41fa7305be08f66bae3e5"
 # Hardcoded paths
@@ -54,8 +53,19 @@ if [[ $(/usr/bin/id -u) -ne 0 ]]; then
     exit 1
 fi
 
+if [ -n "$3" ]; then
+  PYTHON_VERSION=$3
+else
+  PYTHON_VERSION=3.8.3
+fi
+
+if [ -n "$4" ]; then
+  DATE=$4
+else
+  DATE=$(/bin/date -u "+%m%d%Y%H%M%S")
+fi
+
 # Variables
-DATE=$(/bin/date -u "+%m%d%Y%H%M%S")
 TOOLSDIR=$(dirname $0)
 OUTPUTSDIR="$TOOLSDIR/outputs"
 CONSOLEUSER=$(/usr/bin/stat -f "%Su" /dev/console)
