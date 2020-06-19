@@ -16,17 +16,8 @@ jobs:
     runs-on: macos-latest
 
     steps:
-    - name: Get current time
-      uses: srfrnk/current-time@master
-      id: current-time
-      with:
-        format: MMDDYYYYHHmmss
-
-    - name: Use current time
-      env:
-        DATE: "${{ steps.current-time.outputs.time }}"
-        F_DATE: "${{ steps.current-time.outputs.formattedTime }}"
-      run: echo $DATE $F_DATE
+    - name: Get Build Date
+      run: echo ::set-env name=BUILD_DATE::$(/bin/date -u \"+%m%d%Y%H%M%S\")
 
     - name: Checkout python repo
       uses: actions/checkout@v2
@@ -41,7 +32,7 @@ jobs:
     - name: Run build package (recommended pkg)
       env:
         DATE: "${{ steps.current-time.outputs.formattedTime }}"
-      run: /usr/bin/sudo ./build_python_framework_pkgs.zsh "$TYPE" "$DEV_ID" "$PYTHON_VERSION" "{DATE}"
+      run: /usr/bin/sudo ./build_python_framework_pkgs.zsh "$TYPE" "$DEV_ID" "$PYTHON_VERSION" "${env.BUILD_DATE}"
 
     - name: Create Release
       uses: actions/create-release@v1
@@ -49,8 +40,8 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         DATE: "${{ steps.current-time.outputs.formattedTime }}"
       with:
-        tag_name: ${{ DATE }}
-        release_name: Python ${{PYTHON_VERSION}} (${{ github.ref }})
+        tag_name: v${{ env.BUILD_DATE }}
+        release_name: Python ${{env.PYTHON_VERSION}} (${{ env.BUILD_DATE }})
         draft: true
         prerelease: true
 
