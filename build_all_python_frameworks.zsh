@@ -6,8 +6,9 @@
 # Run this with your current directory being the path where this script is located
 
 TOOLSDIR=$(dirname $0)
+SIGNING_IDENTITY="Developer ID Installer: Clever DevOps Co. (9GQZ7KUFR6)"
 
-sudo "$TOOLSDIR/build_python_framework_pkgs.zsh" minimal
-sudo "$TOOLSDIR/build_python_framework_pkgs.zsh" no_customization
-sudo "$TOOLSDIR/build_python_framework_pkgs.zsh" recommended
-sudo "$TOOLSDIR/build_python_framework_pkgs.zsh" opinionated
+sudo "$TOOLSDIR/build_python_framework_pkgs.zsh" minimal ${SIGNING_IDENTITY}
+sudo "$TOOLSDIR/build_python_framework_pkgs.zsh" no_customization ${SIGNING_IDENTITY}
+sudo "$TOOLSDIR/build_python_framework_pkgs.zsh" recommended ${SIGNING_IDENTITY}
+sudo "$TOOLSDIR/build_python_framework_pkgs.zsh" opinionated ${SIGNING_IDENTITY}

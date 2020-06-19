@@ -10,8 +10,8 @@ PYTHON_VERSION=3.8.3
 RP_SHA="8bce58e91895978da6f238c1d2e1de3559ea4643"
 MP_SHA="71c57fcfdf43692adcd41fa7305be08f66bae3e5"
 # Hardcoded paths
-FRAMEWORKDIR="/Library/SystemFrameworks"
-PYTHON_BIN="$FRAMEWORKDIR/Python3.framework/Versions/3.8/bin/python3.8"
+FRAMEWORKDIR="/Library/ManagedFrameworks"
+PYTHON_BIN="$FRAMEWORKDIR/Python3.framework/Versions/Current/bin/python3"
 RP_BINDIR="/tmp/relocatable-python"
 MP_BINDIR="/tmp/munki-pkg"
 
@@ -118,9 +118,8 @@ fi
 echo "Moving Python.framework to payload folder"
 /usr/bin/sudo /bin/mv "${FRAMEWORKDIR}/Python.framework" "$TOOLSDIR/$TYPE/payload/${FRAMEWORKDIR}/Python3.framework"
 
-# make a symbolic link to help with interactive use and stable path
-/bin/ln -s "$PYTHON_BIN" "$TOOLSDIR/$TYPE/payload/usr/local/bin/python3.framework"
-/bin/ln -s "$PYTHON_BIN" "$TOOLSDIR/$TYPE/payload/$FRAMEWORKDIR/Python3.framework/python3"
+# make a symbolic link to help with interactive use
+/bin/ln -s "$PYTHON_BIN" "$TOOLSDIR/$TYPE/payload/usr/local/bin/managed_python3"
 
 # take ownership of the payload folder
 echo "Taking ownership of the Payload directory"
@@ -158,17 +157,49 @@ fi
   "install_location": "/"
 }
 JSONFILE
-# Create the pkg
+# Create the unsigned pkg
 "${MP_BINDIR}/munki-pkg-${MP_SHA}/munkipkg" "$TOOLSDIR/$TYPE"
+# Move the unsigned pkg
+/bin/mv "$TOOLSDIR/$TYPE/build/python_$TYPE-$PYTHON_VERSION.$DATE.pkg" "$OUTPUTSDIR"
 
-# Zip the framework
+if [ -n "$2" ]; then
+  # Create the json file for munki-pkg (signed)
+  /bin/cat << SIGNED_JSONFILE > "$TOOLSDIR/$TYPE/build-info.json"
+  {
+    "ownership": "recommended",
+    "suppress_bundle_relocation": true,
+    "identifier": "org.macadmins.python.$TYPE",
+    "postinstall_action": "none",
+    "distribution_style": true,
+    "version": "$PYTHON_VERSION.$DATE",
+    "name": "python_${TYPE}_signed-$PYTHON_VERSION.$DATE.pkg",
+    "install_location": "/",
+    "signing_info": {
+      "identity": "$2",
+      "timestamp": true
+    }
+  }
+SIGNED_JSONFILE
+  # Create the signed pkg
+  "${MP_BINDIR}/munki-pkg-${MP_SHA}/munkipkg" "$TOOLSDIR/$TYPE"
+  PKG_RESULT="$?"
+  if [ "${PKG_RESULT}" != "0" ]; then
+    echo "Could not sign package: ${PKG_RESULT}" 1>&2
+  else
+    # Move the signed pkg
+    /bin/mv "$TOOLSDIR/$TYPE/build/python_${TYPE}_signed-$PYTHON_VERSION.$DATE.pkg" "$OUTPUTSDIR"
+  fi
+else
+  echo "no signing identity passed, skipping signed package creation"
+fi
+
+# Zip and move the framework
 ZIPFILE="Python3.framework_$TYPE-$PYTHON_VERSION.$DATE.zip"
 /usr/bin/ditto -c -k --sequesterRsrc "$TOOLSDIR/$TYPE/payload/${FRAMEWORKDIR}/" ${ZIPFILE}
-
-# Move all of the output files
 /bin/mv ${ZIPFILE} "$OUTPUTSDIR"
-/bin/mv "$TOOLSDIR/$TYPE/build/python_$TYPE-$PYTHON_VERSION.$DATE.pkg" "$OUTPUTSDIR"
+
+# Ensure outputs directory is owned by the current user
 /usr/bin/sudo /usr/sbin/chown -R ${CONSOLEUSER}:wheel "$OUTPUTSDIR"
 
-# Cleanup
+# Cleanup the temporary files
 /usr/bin/sudo /bin/rm -rf "$TOOLSDIR/$TYPE"
