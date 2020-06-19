@@ -20,7 +20,7 @@ jobs:
       id: set_env_var
       run: |
          echo ::set-env name=BUILD_DATE::$(/bin/date -u "+%m%d%Y%H%M%S")
-         echo ::set-env name=BUILD_DATE_RELEASE::$(/bin/date -u "+%B %d %Y")
+         echo ::set-env name=BUILD_DATE_RELEASE::$(/bin/date -u "+%B %d %Y %H:%M:%S")
 
     - name: Checkout python repo
       uses: actions/checkout@v2
@@ -36,12 +36,13 @@ jobs:
       run: /usr/bin/sudo ./build_python_framework_pkgs.zsh "$TYPE" "$DEV_ID" "$PYTHON_VERSION" "${BUILD_DATE}"
 
     - name: Create Release
+      id: create_release
       uses: actions/create-release@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        tag_name: v.${{ steps.set_env_var.outputs.BUILD_DATE }}
-        release_name: Python ${{env.PYTHON_VERSION}} (${{ steps.set_env_var.outputs.BUILD_DATE_RELEASE }})
+        tag_name: v.${{env.PYTHON_VERSION}}.${{env.BUILD_DATE}}
+        release_name: Python ${{env.PYTHON_VERSION}} (${{env.BUILD_DATE_RELEASE}})
         draft: true
         prerelease: true
 
@@ -49,33 +50,30 @@ jobs:
       uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        DATE: "${{ steps.current-time.outputs.formattedTime }}"
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./outputs/python_$TYPE-$PYTHON_VERSION.$BUILD_DATE.pkg
-        asset_name: python_$TYPE-$PYTHON_VERSION.$BUILD_DATE.pkg
+        asset_path: ./outputs/python_${{env.TYPE}}-${{env.PYTHON_VERSION}}.${{env.BUILD_DATE}}.pkg
+        asset_name: python_${{env.TYPE}}-${{env.PYTHON_VERSION}}.${{env.BUILD_DATE}}.pkg
         asset_content_type: application/x-newton-compatible-pkg
 
     - name: Upload Signed Package Release Asset
       uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        DATE: "${{ steps.current-time.outputs.formattedTime }}"
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./outputs/python_$TYPE_signed-$PYTHON_VERSION.$BUILD_DATE.pkg
-        asset_name: python_$TYPE_signed-$PYTHON_VERSION.$BUILD_DATE.pkg
+        asset_path: ./outputs/python_${{env.TYPE}}_signed-${{env.PYTHON_VERSION}}.${{env.BUILD_DATE}}.pkg
+        asset_name: python_${{env.TYPE}}_signed-${{env.PYTHON_VERSION}}.${{env.BUILD_DATE}}.pkg
         asset_content_type: application/x-newton-compatible-pkg
 
     - name: Upload Python Framework Release Asset
       uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        DATE: "${{ steps.current-time.outputs.formattedTime }}"
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./outputs/Python3.framework_$TYPE-$PYTHON_VERSION.$BUILD_DATE.zip
-        asset_name: Python3.framework_$TYPE-$PYTHON_VERSION.$BUILD_DATE.zip
+        asset_path: ./outputs/Python3.framework_${{env.TYPE}}-${{env.PYTHON_VERSION}}.${{env.BUILD_DATE}}.zip
+        asset_name: Python3.framework_${{env.TYPE}}-${{env.PYTHON_VERSION}}.${{env.BUILD_DATE}}.zip
         asset_content_type: application/zip
 
     - name: Upload packages
