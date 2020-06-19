@@ -16,12 +16,10 @@ jobs:
 
     - name: test
       run: ls -l
-      shell: zsh
       working-directory: python
 
     - name: test 2
       run: ls -l
-      shell: zsh
 
     - name: Install Apple certificates
       if: github.ref == 'refs/heads/main'
@@ -32,7 +30,6 @@ jobs:
 
     - name: Run build package (recommended pkg)
       run: /usr/bin/sudo ./build_python_framework_pkgs.zsh recommended "$DEV_ID"
-      shell: zsh
       env:
         DEV_ID: "Developer ID Installer: Clever DevOps Co. (9GQZ7KUFR6)"
       working-directory: python
