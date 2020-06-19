@@ -43,7 +43,27 @@ jobs:
       with:
         tag_name: v.${{env.PYTHON_VERSION}}.${{env.BUILD_DATE}}
         release_name: Python ${{env.PYTHON_VERSION}} (${{env.BUILD_DATE_RELEASE}})
-        draft: true
+        body: |
+            # Notes
+            Python 3.8.3 Framework
+
+            The package versions comes with two symbolic links to ease the use. Please see the README for more information.
+            - `/usr/local/bin/managed_python3`
+            - `/Library/ManagedFrameworks/Python3.framework/Versions/Current/bin/python3`
+
+            ## Changes since June 15th build
+            - `/Library/SystemFrameworks` is now `/Library/ManagedFrameworks`
+            - `/Library/ManagedFrameworks/Python3.framework/Versions/Current/bin/python3` is the new recommended shebang path
+            - `/usr/local/bin/python3.framework` is now `/usr/local/bin/managed_python3`
+            - Add optional signed packages, build by [Clever DevOps](https://www.cleverdevops.com) signing certificate
+            - Remove unnecessary `Python3.framework/python3` symlink
+
+            # Flavors of Python
+            At this time, the automated build process will **only** create the Recommended package
+
+            ## Recommended
+            This is a Python.framework that contains everything from minimal, and a few libraries that various well known open source projects require.
+        draft: false
         prerelease: true
 
     - name: Upload Unsigned Package Release Asset
