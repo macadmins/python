@@ -49,7 +49,6 @@ jobs:
         prerelease: true
 
     - name: Upload Unsigned Package Release Asset
-      id: upload-release-asset
       uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -61,7 +60,6 @@ jobs:
         asset_content_type: application/x-newton-compatible-pkg
 
     - name: Upload Signed Package Release Asset
-      id: upload-release-asset
       uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -73,7 +71,6 @@ jobs:
         asset_content_type: application/x-newton-compatible-pkg
 
     - name: Upload Python Framework Release Asset
-      id: upload-release-asset
       uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
