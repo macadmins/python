@@ -20,7 +20,7 @@ jobs:
       run: echo ::set-env name=BUILD_DATE::$(/bin/date -u \"+%m%d%Y%H%M%S\")
 
     - name: Print build date
-      run: echo "${env.BUILD_DATE}"
+      run: echo "${BUILD_DATE}"
 
     - name: Checkout python repo
       uses: actions/checkout@v2
@@ -33,7 +33,7 @@ jobs:
         p12-password: ${{ secrets.CERTIFICATES_P12_PASSWORD }}
 
     - name: Run build package script
-      run: /usr/bin/sudo ./build_python_framework_pkgs.zsh "$TYPE" "$DEV_ID" "$PYTHON_VERSION" "${env.BUILD_DATE}"
+      run: /usr/bin/sudo ./build_python_framework_pkgs.zsh "$TYPE" "$DEV_ID" "$PYTHON_VERSION" "${BUILD_DATE}"
 
     - name: Create Release
       uses: actions/create-release@v1
