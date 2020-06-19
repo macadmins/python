@@ -14,10 +14,6 @@ jobs:
     - name: Checkout python repo
       uses: actions/checkout@v2
 
-    - name: test
-      run: ls -l
-      working-directory: python
-
     - name: test 2
       run: ls -l
 
