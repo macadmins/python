@@ -14,9 +14,6 @@ jobs:
     - name: Checkout python repo
       uses: actions/checkout@v2
 
-    - name: test 2
-      run: ls -l
-
     - name: Install Apple certificates
       if: github.ref == 'refs/heads/main'
       uses: apple-actions/import-codesign-certs@v1
@@ -28,7 +25,6 @@ jobs:
       run: /usr/bin/sudo ./build_python_framework_pkgs.zsh recommended "$DEV_ID"
       env:
         DEV_ID: "Developer ID Installer: Clever DevOps Co. (9GQZ7KUFR6)"
-      working-directory: python
 
     - name: Upload packages
       uses: actions/upload-artifact@v1
