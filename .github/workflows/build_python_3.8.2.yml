@@ -45,7 +45,7 @@ jobs:
         release_name: Python ${{env.PYTHON_VERSION}} (${{env.BUILD_DATE_RELEASE}})
         body: |
             # Notes
-            Python 3.8.3 Framework
+            Python 3.8.2 Framework
 
             The package versions comes with two symbolic links to ease the use. Please see the README for more information.
             - `/usr/local/bin/managed_python3`
