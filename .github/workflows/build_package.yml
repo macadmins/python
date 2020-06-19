@@ -24,7 +24,7 @@ jobs:
     - name: Run build package (recommended pkg)
       run: /usr/bin/sudo ./build_python_framework_pkgs.zsh recommended "$DEV_ID"
       env:
-        DEV_ID: Developer ID Installer: Clever DevOps Co. (9GQZ7KUFR6)
+        DEV_ID: "Developer ID Installer: Clever DevOps Co. (9GQZ7KUFR6)"
       working-directory: ./python
 
     - name: Upload packages
