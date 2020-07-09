@@ -1,2 +1,0 @@
-importlib-metadata==1.6.1
-zipp==3.1.0

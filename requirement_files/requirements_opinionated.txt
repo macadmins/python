@@ -4,10 +4,8 @@
 -r black.txt
 -r boto.txt
 -r entrypoints.txt
--r flake8.txt
 -r flake8-bugbear.txt
 -r funcsigs.txt
--r importlib-metadata.txt
 -r isort.txt
 -r packaging.txt
 -r pre-commit.txt
@@ -20,5 +18,4 @@
 -r slacker.txt
 -r Sphinx.txt
 -r tokenize-rt.txt
--r virtualenv.txt
 -r xattr.txt
