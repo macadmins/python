@@ -49,11 +49,12 @@ jobs:
 
             The package versions comes with two symbolic links to ease the use. Please see the README for more information.
             - `/usr/local/bin/managed_python3`
-            - `/Library/ManagedFrameworks/Python3.framework/Versions/Current/bin/python3`
+            - `/Library/ManagedFrameworks/Python/Python3.framework/Versions/Current/bin/python3`
 
-            ## Changes since June 15th build
+            ## Changes
+            - Python3.framework is now in `/Library/ManagedFrameworks/Python` and no longer in `/Library/ManagedFrameworks`
             - `/Library/SystemFrameworks` is now `/Library/ManagedFrameworks`
-            - `/Library/ManagedFrameworks/Python3.framework/Versions/Current/bin/python3` is the new recommended shebang path
+            - `/Library/ManagedFrameworks/Python/Python3.framework/Versions/Current/bin/python3` is the new recommended shebang path
             - `/usr/local/bin/python3.framework` is now `/usr/local/bin/managed_python3`
             - Add optional signed packages, build by [Clever DevOps](https://www.cleverdevops.com) signing certificate
             - Remove unnecessary `Python3.framework/python3` symlink
