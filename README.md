@@ -1,22 +1,22 @@
 # python
-A Python 3 framework that currently installs to `/Library/ManagedFrameworks/Python3.framework`.
+A Python 3 framework that currently installs to `/Library/ManagedFrameworks/Python/Python3.framework`.
 
 Please see Apple's documentation on [file system basics](https://developer.apple.com/library/archive/documentation/FileManagement/Conceptual/FileSystemProgrammingGuide/FileSystemOverview/FileSystemOverview.html) for more information on the thought process here.
 
 This is an intended replacement for when Apple removes `/usr/bin/python`
 
 ## Using interactively
-After installing any of the packages, a symbolic link can be used within terminal for interactive Python sessions. At the time of this writing `/usr/local/bin/managed_python3` points to `/Library/ManagedFrameworks/Python3.framework/Versions/Current/bin/python3`
+After installing any of the packages, a symbolic link can be used within terminal for interactive Python sessions. At the time of this writing `/usr/local/bin/managed_python3` points to `/Library/ManagedFrameworks/Python/Python3.framework/Versions/Current/bin/python3`
 
 ## Using with scripts
 It is currently recommended to point directly to symbolic link provided by the Python framework.
 
-At the time of this writing `/Library/ManagedFrameworks/Python3.framework/Versions/Current/bin/python3` points to `/Library/ManagedFrameworks/Python3.framework/Versions/3.8/bin/python3.8`
+At the time of this writing `/Library/ManagedFrameworks/Python/Python3.framework/Versions/Current/bin/python3` points to `/Library/ManagedFrameworks/Python/Python3.framework/Versions/3.8/bin/python3.8`
 
 An example script would look like the following:
 
 ```
-#!/Library/ManagedFrameworks/Python3.framework/Versions/Current/bin/python3
+#!/Library/ManagedFrameworks/Python/Python3.framework/Versions/Current/bin/python3
 
 print('This is an example script.')
 ```
@@ -25,7 +25,7 @@ print('This is an example script.')
 #### zshenv global alias
 If you are calling `python` within `zsh` scripts, adding a global alias to `/etc/zshenv` may be appropriate.
 
-`alias -g python3.framework='/Library/ManagedFrameworks/Python3.framework/Versions/Current/bin/python3'`
+`alias -g python3.framework='/Library/ManagedFrameworks/Python/Python3.framework/Versions/Current/bin/python3'`
 
 For more information on this method, please see Armin Briegel's "Moving to Zsh" Part [II](https://scriptingosx.com/2019/06/moving-to-zsh-part-2-configuration-files/) and [IV](https://scriptingosx.com/2019/07/moving-to-zsh-part-4-aliases-and-functions/)
 

@@ -9,7 +9,7 @@
 RP_SHA="8bce58e91895978da6f238c1d2e1de3559ea4643"
 MP_SHA="71c57fcfdf43692adcd41fa7305be08f66bae3e5"
 # Hardcoded paths
-FRAMEWORKDIR="/Library/ManagedFrameworks"
+FRAMEWORKDIR="/Library/ManagedFrameworks/Python"
 PYTHON_BIN="$FRAMEWORKDIR/Python3.framework/Versions/Current/bin/python3"
 RP_BINDIR="/tmp/relocatable-python"
 MP_BINDIR="/tmp/munki-pkg"
