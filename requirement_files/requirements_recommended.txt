@@ -1,5 +1,6 @@
 -r aspy.yaml.txt
 -r black.txt
+-r docklib.txt
 -r entrypoints.txt
 -r flake8-bugbear.txt
 -r isort.txt

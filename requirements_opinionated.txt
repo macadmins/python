@@ -13,6 +13,7 @@ cfgv==3.1.0
 chardet==3.0.4
 click==7.1.2
 distlib==0.3.1
+docklib==1.2.0
 docutils==0.16
 entrypoints==0.3
 filelock==3.0.12
