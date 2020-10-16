@@ -3,6 +3,7 @@
 -r atomicwrites.txt
 -r black.txt
 -r boto.txt
+-r docklib.txt
 -r entrypoints.txt
 -r flake8-bugbear.txt
 -r funcsigs.txt
