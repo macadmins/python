@@ -19,8 +19,8 @@ jobs:
     - name: Set environment variables
       id: set_env_var
       run: |
-         echo ::set-env name=BUILD_DATE::$(/bin/date -u "+%m%d%Y%H%M%S")
-         echo ::set-env name=BUILD_DATE_RELEASE::$(/bin/date -u "+%B %d %Y %H:%M:%S")
+         echo "BUILD_DATE=$(/bin/date -u "+%m%d%Y%H%M%S")" >> $GITHUB_ENV
+         echo "BUILD_DATE_RELEASE=$(/bin/date -u "+%B %d %Y %H:%M:%S")" >> $GITHUB_ENV
 
     - name: Checkout python repo
       uses: actions/checkout@v2

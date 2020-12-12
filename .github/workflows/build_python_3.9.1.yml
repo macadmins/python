@@ -3,7 +3,7 @@ name: Build and upload recommended package
 env:
   TYPE: "recommended"
   DEV_ID: "Developer ID Installer: Clever DevOps Co. (9GQZ7KUFR6)"
-  PYTHON_VERSION: "3.8.2"
+  PYTHON_VERSION: "3.9.1"
 
 on:
   pull_request:
@@ -45,7 +45,7 @@ jobs:
         release_name: Python ${{env.PYTHON_VERSION}} (${{env.BUILD_DATE_RELEASE}})
         body: |
             # Notes
-            Python 3.8.2 Framework
+            Python 3.9.1 Framework
 
             The package versions comes with two symbolic links to ease the use. Please see the README for more information.
             - `/usr/local/bin/managed_python3`
