@@ -16,6 +16,7 @@ FRAMEWORKDIR="/Library/ManagedFrameworks/Python"
 PYTHON_BIN="$FRAMEWORKDIR/Python3.framework/Versions/Current/bin/python3"
 RP_BINDIR="/tmp/relocatable-python"
 MP_BINDIR="/tmp/munki-pkg"
+PIPCACHEDIR="/Users/${CONSOLEUSER}/Library/Caches/pip"
 
 # Sanity Checks
 ## Type Check
@@ -78,14 +79,20 @@ RP_ZIP="/tmp/relocatable-python.zip"
 MP_ZIP="/tmp/munki-pkg.zip"
 echo "Creating Python Framework - $TYPE"
 
-# Create framework path if not present
+# Create framework path if not present with 777 so sudo is not needed
 if [ ! -d "${FRAMEWORKDIR}" ]; then
-    /usr/bin/sudo /bin/mkdir -p "${FRAMEWORKDIR}"
+    /usr/bin/sudo /bin/mkdir -m 777 -p "${FRAMEWORKDIR}"
 fi
 
 # remove existing library Python.framework if present
 if [ -d "${FRAMEWORKDIR}/Python.framework" ]; then
-    /usr/bin/sudo /bin/rm -rf "${FRAMEWORKDIR}/Python.framework"
+    /bin/rm -rf "${FRAMEWORKDIR}/Python.framework"
+fi
+
+# remove existing library Python.framework if present
+if [ -d "${PIPCACHEDIR}" ]; then
+    echo "Removing pip cache to reduce framework build errors"
+    /usr/bin/sudo /bin/rm -rf "${PIPCACHEDIR}"
 fi
 
 # Download specific version of relocatable-python
@@ -118,7 +125,7 @@ fi
 
 # build the framework
 RP_EXTRACT_BINDIR="${RP_BINDIR}/relocatable-python-${RP_SHA}"
-/usr/bin/sudo "${RP_EXTRACT_BINDIR}/make_relocatable_python_framework.py" \
+"${RP_EXTRACT_BINDIR}/make_relocatable_python_framework.py" \
 --baseurl "${PYTHON_BASEURL}" \
 --python-version "${PYTHON_VERSION}" \
 --os-version "${MACOS_VERSION}" \
@@ -134,7 +141,7 @@ fi
 
 # move the framework to the Python package folder
 echo "Moving Python.framework to payload folder"
-/usr/bin/sudo /bin/mv "${FRAMEWORKDIR}/Python.framework" "$TOOLSDIR/$TYPE/payload/${FRAMEWORKDIR}/Python3.framework"
+/bin/mv "${FRAMEWORKDIR}/Python.framework" "$TOOLSDIR/$TYPE/payload/${FRAMEWORKDIR}/Python3.framework"
 
 # ad-hoc re-sign the framework so it will run on Apple Silicon
 echo "Adding ad-hoc code signing so the framework will run on Apple Silicon..."
@@ -229,3 +236,4 @@ ZIPFILE="Python3.framework_$TYPE-$PYTHON_VERSION.$DATE.zip"
 
 # Cleanup the temporary files
 /usr/bin/sudo /bin/rm -rf "$TOOLSDIR/$TYPE"
+/usr/bin/sudo /bin/rm -rf "${FRAMEWORKDIR}"
