@@ -3,7 +3,7 @@ name: Build and upload recommended package
 env:
   TYPE: "recommended"
   DEV_ID: "Developer ID Installer: Clever DevOps Co. (9GQZ7KUFR6)"
-  PYTHON_VERSION: "3.8.2"
+  PYTHON_VERSION: "3.9.1"
 
 on:
   pull_request:
@@ -19,8 +19,8 @@ jobs:
     - name: Set environment variables
       id: set_env_var
       run: |
-         echo ::set-env name=BUILD_DATE::$(/bin/date -u "+%m%d%Y%H%M%S")
-         echo ::set-env name=BUILD_DATE_RELEASE::$(/bin/date -u "+%B %d %Y %H:%M:%S")
+         echo "BUILD_DATE=$(/bin/date -u "+%m%d%Y%H%M%S")" >> $GITHUB_ENV
+         echo "BUILD_DATE_RELEASE=$(/bin/date -u "+%B %d %Y %H:%M:%S")" >> $GITHUB_ENV
 
     - name: Checkout python repo
       uses: actions/checkout@v2
@@ -45,19 +45,12 @@ jobs:
         release_name: Python ${{env.PYTHON_VERSION}} (${{env.BUILD_DATE_RELEASE}})
         body: |
             # Notes
-            Python 3.8.2 Framework
-
-            The package versions comes with two symbolic links to ease the use. Please see the README for more information.
-            - `/usr/local/bin/managed_python3`
-            - `/Library/ManagedFrameworks/Python/Python3.framework/Versions/Current/bin/python3`
+            Python 3.9.1 Framework
 
             ## Changes
-            - Python3.framework is now in `/Library/ManagedFrameworks/Python` and no longer in `/Library/ManagedFrameworks`
-            - `/Library/SystemFrameworks` is now `/Library/ManagedFrameworks`
-            - `/Library/ManagedFrameworks/Python/Python3.framework/Versions/Current/bin/python3` is the new recommended shebang path
-            - `/usr/local/bin/python3.framework` is now `/usr/local/bin/managed_python3`
-            - Add optional signed packages, build by [Clever DevOps](https://www.cleverdevops.com) signing certificate
-            - Remove unnecessary `Python3.framework/python3` symlink
+            - Universal build! Now supports Apple M1 Machines
+            - Upgraded Python to 3.9.1
+            - pyobjc is now 7.0.1
 
             # Flavors of Python
             At this time, the automated build process will **only** create the Recommended package
