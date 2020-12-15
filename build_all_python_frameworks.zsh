@@ -8,7 +8,7 @@
 TOOLSDIR=$(dirname $0)
 SIGNING_IDENTITY="Developer ID Installer: Clever DevOps Co. (9GQZ7KUFR6)"
 
-sudo "$TOOLSDIR/build_python_framework_pkgs.zsh" minimal ${SIGNING_IDENTITY}
-sudo "$TOOLSDIR/build_python_framework_pkgs.zsh" no_customization ${SIGNING_IDENTITY}
-sudo "$TOOLSDIR/build_python_framework_pkgs.zsh" recommended ${SIGNING_IDENTITY}
-sudo "$TOOLSDIR/build_python_framework_pkgs.zsh" opinionated ${SIGNING_IDENTITY}
+"$TOOLSDIR/build_python_framework_pkgs.zsh" minimal ${SIGNING_IDENTITY}
+"$TOOLSDIR/build_python_framework_pkgs.zsh" no_customization ${SIGNING_IDENTITY}
+"$TOOLSDIR/build_python_framework_pkgs.zsh" recommended ${SIGNING_IDENTITY}
+"$TOOLSDIR/build_python_framework_pkgs.zsh" opinionated ${SIGNING_IDENTITY}

@@ -91,6 +91,9 @@ if [ -d "${PIPCACHEDIR}" ]; then
     /usr/bin/sudo /bin/rm -rf "${PIPCACHEDIR}"
 fi
 
+# kill homebrew packages
+/usr/local/bin/brew remove --force $(/usr/local/bin/brew list)
+
 # Download specific version of relocatable-python
 echo "Downloading relocatable-python tool from github..."
 if [ -f "${RP_ZIP}" ]; then
