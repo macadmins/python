@@ -1,7 +1,7 @@
 #!/bin/zsh
 #
 # Build script for all Python 3 frameworks
-# Adaptd from https://github.com/munki/munki/blob/Munki3dev/code/tools/build_python_framework.sh
+# Adapted from https://github.com/munki/munki/blob/Munki3dev/code/tools/build_python_framework.sh
 # IMPORTANT
 # Run this with your current directory being the path where this script is located
 
