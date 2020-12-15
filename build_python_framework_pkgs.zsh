@@ -16,6 +16,7 @@ FRAMEWORKDIR="/Library/ManagedFrameworks/Python"
 PYTHON_BIN="$FRAMEWORKDIR/Python3.framework/Versions/Current/bin/python3"
 RP_BINDIR="/tmp/relocatable-python"
 MP_BINDIR="/tmp/munki-pkg"
+CONSOLEUSER=$(/usr/bin/stat -f "%Su" /dev/console)
 PIPCACHEDIR="/Users/${CONSOLEUSER}/Library/Caches/pip"
 
 # Sanity Checks
@@ -51,11 +52,6 @@ else
   echo "          A python framework with libraries for as many macadmin tools as possible"
   exit 1
 fi
-## Root Check
-if [[ $(/usr/bin/id -u) -ne 0 ]]; then
-    echo "This tool requires elevated access to run"
-    exit 1
-fi
 
 if [ -n "$3" ]; then
   PYTHON_VERSION=$3
@@ -84,9 +80,9 @@ if [ ! -d "${FRAMEWORKDIR}" ]; then
     /usr/bin/sudo /bin/mkdir -m 777 -p "${FRAMEWORKDIR}"
 fi
 
-# remove existing library Python.framework if present
+# remove existing Python.framework if present
 if [ -d "${FRAMEWORKDIR}/Python.framework" ]; then
-    /bin/rm -rf "${FRAMEWORKDIR}/Python.framework"
+    /usr/bin/sudo /bin/rm -rf "${FRAMEWORKDIR}/Python.framework"
 fi
 
 # remove existing library Python.framework if present
