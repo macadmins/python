@@ -148,6 +148,7 @@ six==1.15.0
 tokenize-rt==4.0.0
 toml==0.10.1
 typed-ast==1.4.1
+--no-binary typed-ast
 urllib3==1.25.9
 virtualenv==20.0.26
 xattr==0.9.7
