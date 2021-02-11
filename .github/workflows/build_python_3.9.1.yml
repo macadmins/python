@@ -27,7 +27,7 @@ jobs:
 
     - name: Install Apple certificates
       if: github.ref == 'refs/heads/main'
-      uses: apple-actions/import-codesign-certs@v1
+      uses: apple-actions/import-codesign-certs@253ddeeac23f2bdad1646faac5c8c2832e800071
       with:
         p12-file-base64: ${{ secrets.CERTIFICATES_P12 }}
         p12-password: ${{ secrets.CERTIFICATES_P12_PASSWORD }}
