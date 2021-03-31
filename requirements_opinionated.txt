@@ -1,4 +1,4 @@
-valabaster==0.7.12
+alabaster==0.7.12
 appdirs==1.4.4
 arrow==0.15.7
 aspy.yaml==1.3.0
