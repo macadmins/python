@@ -6,7 +6,7 @@ identify==1.4.21
 importlib-metadata==1.7.0
 nodeenv==1.4.0
 pre-commit==2.6.0
-PyYAML==5.3.1
+PyYAML==5.4.1
 six==1.15.0
 toml==0.10.1
 virtualenv==20.0.26
