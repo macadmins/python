@@ -35,7 +35,7 @@ packaging==20.4
 pathspec==0.8.0
 pluggy==0.13.1
 pre-commit==2.6.0
-py==1.9.0
+py==1.10.0
 pyasn1==0.4.8
 pycodestyle==2.6.0
 pycparser==2.20
