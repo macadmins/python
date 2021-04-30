@@ -51,7 +51,7 @@ pytz==2020.1
 PyYAML==5.3.1
 regex==2020.6.8
 requests==2.24.0
-rsa==4.6
+rsa==4.7
 six==1.15.0
 slacker==0.14.0
 snowballstemmer==2.0.0
