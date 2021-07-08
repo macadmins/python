@@ -56,7 +56,7 @@ fi
 if [ -n "$3" ]; then
   PYTHON_VERSION=$3
 else
-  PYTHON_VERSION=3.9.1
+  PYTHON_VERSION=3.9.5
 fi
 # Set python bin version based on PYTHON_VERSION
 PYTHON_BIN_VERSION="${PYTHON_VERSION%.*}"
