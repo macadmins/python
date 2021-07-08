@@ -168,6 +168,9 @@ if [ "${TOTAL_SO}" != "${UNIVERSAL_SO}" ] ; then
   echo "Shared objects do not match, resulting in a non-universal Python framework."
   echo "Total shared objects found: ${TOTAL_SO}"
   echo "Universal shared objects found: ${UNIVERSAL_SO}"
+  UNIVERSAL_SO_ARRAY=("${(@f)$(/usr/bin/find "$TOOLSDIR/$TYPE/payload/${FRAMEWORKDIR}/Python3.framework/Versions/Current/lib" -name "*.so" | /usr/bin/xargs file | /usr/bin/grep "2 architectures"  | awk '{print $1;}' | sed 's/:*$//g')}")
+  TOTAL_SO_ARRAY=("${(@f)$(/usr/bin/find "$TOOLSDIR/$TYPE/payload/${FRAMEWORKDIR}/Python3.framework/Versions/Current/lib" -name "*.so" )}")
+  echo ${TOTAL_SO_ARRAY[@]} ${UNIVERSAL_SO_ARRAY[@]} | tr ' ' '\n' | sort | uniq -u
   exit 1
 fi
 
