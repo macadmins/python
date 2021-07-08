@@ -1,7 +1,7 @@
 name: Build and upload recommended package
 
 env:
-  TYPE: "recommended"
+  TYPE: "minimal"
   DEV_ID: "Developer ID Installer: Clever DevOps Co. (9GQZ7KUFR6)"
   PYTHON_VERSION: "3.9.5"
 
