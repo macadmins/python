@@ -89,6 +89,7 @@ jobs:
         prerelease: true
 
     - name: Upload Unsigned Package Release Asset
+      if: github.ref == 'refs/heads/main'
       uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -110,6 +111,7 @@ jobs:
         asset_content_type: application/x-newton-compatible-pkg
 
     - name: Upload Python Framework Release Asset
+      if: github.ref == 'refs/heads/main'
       uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -120,7 +122,7 @@ jobs:
         asset_content_type: application/zip
 
     - name: Upload packages
-      uses: actions/upload-artifact@v1
+      uses: actions/upload-artifact@v2
       with:
         name: packages
         path: outputs/
