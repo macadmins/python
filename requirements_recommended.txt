@@ -2,7 +2,7 @@ appdirs==1.4.4
 attrs==21.2.0
 black==21.6b0
 certifi==2021.05.30
-cffi==1.14.6
+cffi==1.14.5
 --no-binary cffi
 cfgv==3.3.0
 chardet==3.0.4
@@ -27,7 +27,7 @@ pycparser==2.20
 pyflakes==2.3.1
 pyobjc==7.3
 pyparsing==2.4.7
-PyYAML==5.4.1.1
+PyYAML==5.4.1
 regex==2021.7.6
 requests==2.25.1
 six==1.16.0
