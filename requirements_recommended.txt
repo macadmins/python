@@ -28,9 +28,9 @@ pyflakes==2.3.1
 pyobjc==7.0.1
 pyparsing==2.4.7
 PyYAML==5.4.1
---no-binary xattr
+--no-binary PyYAML
 regex==2021.7.6
---no-binary xattr
+--no-binary regex
 requests==2.25.1
 six==1.16.0
 tokenize-rt==4.1.0
