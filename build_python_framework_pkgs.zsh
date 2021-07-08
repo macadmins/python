@@ -8,7 +8,7 @@
 # Harcoded versions
 RP_SHA="93f3fea5290b761b1c25c15f46f7c76641d94d58"
 MP_SHA="71c57fcfdf43692adcd41fa7305be08f66bae3e5"
-MACOS_VERSION=11.0 # use 10.9 for non-universal
+MACOS_VERSION=11 # use 10.9 for non-universal
 PYTHON_PRERELEASE_VERSION=
 PYTHON_BASEURL="https://www.python.org/ftp/python/%s/python-%s${PYTHON_PRERELEASE_VERSION}-macos%s.pkg"
 # Hardcoded paths
@@ -56,7 +56,7 @@ fi
 if [ -n "$3" ]; then
   PYTHON_VERSION=$3
 else
-  PYTHON_VERSION=3.9.1
+  PYTHON_VERSION=3.9.5
 fi
 # Set python bin version based on PYTHON_VERSION
 PYTHON_BIN_VERSION="${PYTHON_VERSION%.*}"
@@ -168,6 +168,9 @@ if [ "${TOTAL_SO}" != "${UNIVERSAL_SO}" ] ; then
   echo "Shared objects do not match, resulting in a non-universal Python framework."
   echo "Total shared objects found: ${TOTAL_SO}"
   echo "Universal shared objects found: ${UNIVERSAL_SO}"
+  UNIVERSAL_SO_ARRAY=("${(@f)$(/usr/bin/find "$TOOLSDIR/$TYPE/payload/${FRAMEWORKDIR}/Python3.framework/Versions/Current/lib" -name "*.so" | /usr/bin/xargs file | /usr/bin/grep "2 architectures"  | awk '{print $1;}' | sed 's/:*$//g')}")
+  TOTAL_SO_ARRAY=("${(@f)$(/usr/bin/find "$TOOLSDIR/$TYPE/payload/${FRAMEWORKDIR}/Python3.framework/Versions/Current/lib" -name "*.so" )}")
+  echo ${TOTAL_SO_ARRAY[@]} ${UNIVERSAL_SO_ARRAY[@]} | tr ' ' '\n' | sort | uniq -u
   exit 1
 fi
 
