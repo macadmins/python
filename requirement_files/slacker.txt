@@ -3,4 +3,4 @@ chardet==3.0.4
 idna==2.10
 requests==2.24.0
 slacker==0.14.0
-urllib3==1.25.9
+urllib3==1.26.5
