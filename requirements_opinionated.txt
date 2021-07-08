@@ -48,7 +48,7 @@ pytest==5.4.3
 python-dateutil==2.8.1
 python-dotenv==0.14.0
 pytz==2020.1
-PyYAML==5.4
+PyYAML==5.4.1
 regex==2020.6.8
 requests==2.25.1
 rsa==4.7
