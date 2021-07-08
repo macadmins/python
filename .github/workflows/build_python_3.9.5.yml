@@ -1,7 +1,7 @@
 name: Build and upload recommended package
 
 env:
-  TYPE: "minimal"
+  TYPE: "recommended"
   DEV_ID: "Developer ID Installer: Clever DevOps Co. (9GQZ7KUFR6)"
   PYTHON_VERSION: "3.9.5"
 
@@ -49,8 +49,18 @@ jobs:
 
             ## Changes
             - Upgraded Python to 3.9.5
-            - Docklib updated tgo 1.3.0
             - Dependabot security changes merged in
+            - Updated the following libraries:
+              - attrs to 21.2.0
+              - black to 21.6b0
+              - certifi to 2021.05.30
+              - cffi to 1.14.6
+              - cfgv to 3.3.0
+              - docklib updated to 1.3.0
+            - Update flake8-bugbear to 21.4.3 and dependencies to latest compatible version
+            - Update isort to 5.9.2
+            - Update packaging to 20.9 and dependencies to latest compatible version
+            - Removed aspy.yaml, see https://github.com/asottile-archive/aspy.yaml
 
             # Flavors of Python
             At this time, the automated build process will **only** create the Recommended package
