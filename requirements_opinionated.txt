@@ -50,7 +50,7 @@ python-dotenv==0.14.0
 pytz==2020.1
 PyYAML==5.4
 regex==2020.6.8
-requests==2.24.0
+requests==2.25.1
 rsa==4.7
 six==1.15.0
 slacker==0.14.0

@@ -30,7 +30,7 @@ pyobjc==7.0.1
 pyparsing==2.4.7
 PyYAML==5.4
 regex==2020.6.8
-requests==2.24.0
+requests==2.25.1
 six==1.15.0
 tokenize-rt==4.0.0
 toml==0.10.1
