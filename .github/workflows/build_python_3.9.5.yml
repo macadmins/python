@@ -36,6 +36,7 @@ jobs:
       run: ./build_python_framework_pkgs.zsh "$TYPE" "$DEV_ID" "$PYTHON_VERSION" "${BUILD_DATE}"
 
     - name: Create Release
+      if: github.ref == 'refs/heads/main'
       id: create_release
       uses: actions/create-release@v1
       env:
@@ -98,6 +99,7 @@ jobs:
         asset_content_type: application/x-newton-compatible-pkg
 
     - name: Upload Signed Package Release Asset
+      if: github.ref == 'refs/heads/main'
       uses: actions/upload-release-asset@v1
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
