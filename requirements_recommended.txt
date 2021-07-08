@@ -25,7 +25,7 @@ pre-commit==2.13.0
 pycodestyle==2.7.0
 pycparser==2.20
 pyflakes==2.3.1
-pyobjc==7.3
+pyobjc==7.0.1
 pyparsing==2.4.7
 PyYAML==5.4.1
 regex==2021.7.6
