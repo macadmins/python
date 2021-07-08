@@ -3,7 +3,7 @@ name: Build and upload recommended package
 env:
   TYPE: "recommended"
   DEV_ID: "Developer ID Installer: Clever DevOps Co. (9GQZ7KUFR6)"
-  PYTHON_VERSION: "3.9.1"
+  PYTHON_VERSION: "3.9.5"
 
 on:
   pull_request:
@@ -45,12 +45,12 @@ jobs:
         release_name: Python ${{env.PYTHON_VERSION}} (${{env.BUILD_DATE_RELEASE}})
         body: |
             # Notes
-            Python 3.9.1 Framework
+            Python 3.9.5 Framework
 
             ## Changes
-            - Universal build! Now supports Apple M1 Machines
-            - Upgraded Python to 3.9.1
-            - pyobjc is now 7.0.1
+            - Upgraded Python to 3.9.5
+            - Docklib updated tgo 1.3.0
+            - Dependabot security changes merged in
 
             # Flavors of Python
             At this time, the automated build process will **only** create the Recommended package
