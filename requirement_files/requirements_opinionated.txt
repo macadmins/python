@@ -1,4 +1,5 @@
 -r arrow.txt
+-r asn1crypto.txt
 -r aspy.yaml.txt
 -r atomicwrites.txt
 -r black.txt

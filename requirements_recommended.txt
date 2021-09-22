@@ -1,4 +1,6 @@
 appdirs==1.4.4
+asn1crypto==1.4.0
+--no-binary asn1crypto
 attrs==21.2.0
 black==21.6b0
 certifi==2021.05.30

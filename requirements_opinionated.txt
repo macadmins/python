@@ -1,6 +1,8 @@
 alabaster==0.7.12
 appdirs==1.4.4
 arrow==0.15.7
+asn1crypto==1.4.0
+--no-binary asn1crypto
 aspy.yaml==1.3.0
 atomicwrites==1.4.0
 attrs==19.3.0
