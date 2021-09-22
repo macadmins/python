@@ -1,3 +1,4 @@
+-r asn1crypto.txt
 -r aspy.yaml.txt
 -r black.txt
 -r docklib.txt
