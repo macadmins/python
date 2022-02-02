@@ -3,7 +3,7 @@ name: Build and upload recommended package
 env:
   TYPE: "recommended"
   DEV_ID: "Developer ID Installer: Clever DevOps Co. (9GQZ7KUFR6)"
-  PYTHON_VERSION: "3.9.5"
+  PYTHON_VERSION: "3.9.10"
 
 on:
   pull_request:
@@ -46,39 +46,44 @@ jobs:
         release_name: Python ${{env.PYTHON_VERSION}} (${{env.BUILD_DATE_RELEASE}})
         body: |
             # Notes
-            Python 3.9.5 Framework
+            Python 3.9.10 Framework
 
             ## Changes
-            - Upgraded Python to 3.9.5
+            - Upgraded Python to 3.9.10
+            **Note: Some of these updates have breaking changes. Always test your code before deploying to production!**
             - Updated the following libraries:
-              - attrs to 21.2.0
-              - black to 21.6b0
-              - certifi to 2021.05.30
-              - cffi to 1.14.5
-              - cfgv to 3.3.0
-              - distlib to 0.3.2
-              - docklib to 1.3.0
-              - flake8-bugbear to 21.4.3
-              - flake8 to 3.9.2
-              - identify to 2.2.10
-              - importlib-metadata to 4.6.1
-              - isort to 5.9.2
-              - nodeenv to 1.6.0
-              - packaging to 21.0
-              - pathspec to 0.8.1
-              - pre-commit to 2.13.0
-              - pycodestyle to 2.7.0
-              - pyflakes to 2.3.1
-              - PyYAML to 5.4.1
-              - regex to 2021.7.6
-              - requests to 2.25.1
-              - six to 1.16.0
-              - tokenize-rt to 4.1.0
-              - toml to 0.10.2
-              - typed-ast to 1.4.3
-              - urllib3 to 1.26.6
-              - virtualenv to 20.0.27
-              - zipp to 3.5.0
+              - attrs to 21.4.0
+              - black to 22.1.0
+              - certifi to 2021.10.8
+              - cffi to 1.15.0
+              - cfgv to 3.3.1
+              - chardet to 4.0.0
+              - click to 8.0.3
+              - distlib to 0.3.4
+              - filelock to 3.4.2
+              - flake8-bugbear to 22.1.11
+              - flake8 to 4.0.1
+              - identify to 2.4.7
+              - idna to 3.3
+              - importlib-metadata to 4.10.1
+              - isort to 5.10.1
+              - packaging to 21.3
+              - pathspec to 0.9.0
+              - pre-commit to 2.17.0
+              - pycodestyle to 2.8.0
+              - pycparser to 2.21
+              - pyflakes to 2.4.0
+              - pyobjc to 8.2
+              - pyparsing to 3.0.7
+              - PyYAML to 6.0
+              - regex to 2022.1.18
+              - requests to 2.27.1
+              - tokenize-rt to 4.2.0
+              - typed-ast to 1.5.2
+              - urllib3 to 1.26.8
+              - virtualenv to 20.13.0
+              - xattr to 0.9.9
+              - zipp to 3.7.0
 
             # Flavors of Python
             At this time, the automated build process will **only** create the Recommended package
