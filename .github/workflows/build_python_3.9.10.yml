@@ -73,7 +73,7 @@ jobs:
               - pycodestyle to 2.8.0
               - pycparser to 2.21
               - pyflakes to 2.4.0
-              - pyobjc to 7.3
+              - pyobjc to 8.2
               - pyparsing to 3.0.7
               - PyYAML to 6.0
               - regex to 2022.1.18
