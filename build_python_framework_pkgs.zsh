@@ -26,12 +26,10 @@ if [ -n "$1" ]; then
         TYPE=$1
     elif [[ "$1" == "no_customization" ]]; then
         TYPE=$1
-    elif [[ "$1" == "opinionated" ]]; then
-        TYPE=$1
     elif [[ "$1" == 'recommended' ]]; then
         TYPE=$1
     else
-        echo "Specified positional argument other than opinionated or recommended. Using minimal workflow"
+        echo "Specified positional argument other than recommended. Using minimal workflow"
         TYPE='minimal'
     fi
 else
