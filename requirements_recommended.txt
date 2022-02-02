@@ -29,6 +29,7 @@ pycodestyle==2.8.0
 pycparser==2.21
 pyflakes==2.4.0
 pyobjc==7.3
+--no-binary pyobjc
 pyparsing==3.0.7
 PyYAML==6.0
 --no-binary PyYAML
