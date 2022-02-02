@@ -21,6 +21,8 @@ PIPCACHEDIR="/Users/${CONSOLEUSER}/Library/Caches/pip"
 # DEV_ACCOUNT="" # Sourced from env vars
 # NOTARY_PASS="" # Sourced from env vars
 
+## Notarization functions borrowed from Armin Briegel
+## https://scriptingosx.com/2019/09/notarize-a-command-line-tool/
 # Checks the notarization request status
 requeststatus() { # $1: requestUUID
     requestUUID=${1?:"need a request UUID"}
