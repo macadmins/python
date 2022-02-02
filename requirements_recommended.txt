@@ -36,7 +36,7 @@ regex==2022.1.18
 --no-binary regex
 requests==2.27.1
 six==1.16.0
-tokenize-rt==4.2.0
+tokenize-rt==4.2.1
 toml==0.10.2
 typed-ast==1.5.2
 --no-binary typed-ast
