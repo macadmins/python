@@ -18,67 +18,10 @@ RP_BINDIR="/tmp/relocatable-python"
 MP_BINDIR="/tmp/munki-pkg"
 CONSOLEUSER=$(/usr/bin/stat -f "%Su" /dev/console)
 PIPCACHEDIR="/Users/${CONSOLEUSER}/Library/Caches/pip"
-# DEV_ACCOUNT="" # Sourced from env vars
-# NOTARY_PASS="" # Sourced from env vars
-
-## Notarization functions borrowed from Armin Briegel
-## https://scriptingosx.com/2019/09/notarize-a-command-line-tool/
-# Checks the notarization request status
-requeststatus() { # $1: requestUUID
-    requestUUID=${1?:"need a request UUID"}
-    req_status=$(xcrun altool --notarization-info "$requestUUID" \
-                              --username "${DEV_ACCOUNT}" \
-                              --password "${NOTARY_PASS}" 2>&1 \
-                 | awk -F ': ' '/Status:/ { print $2; }' )
-    echo "$req_status"
-}
-
-
-notarizefile() { # $1: path to file to notarize, $2: identifier
-    filepath=${1:?"need a filepath"}
-    identifier=${2:?"need an identifier"}
-
-	echo $filepath
-	echo $identifier
-
-    # upload file
-    echo "## uploading $filepath for notarization"
-    requestUUID=$(xcrun altool --notarize-app \
-							   --type osx \
-                               --primary-bundle-id "$identifier" \
-                               --username "${DEV_ACCOUNT}" \
-                               --password "${NOTARY_PASS}" \
-                               --file "$filepath" 2>&1 \
-                  | awk '/RequestUUID/ { print $NF; }')
-
-    echo "Notarization RequestUUID: $requestUUID"
-
-    if [[ $requestUUID == "" ]]; then
-        echo "could not upload for notarization"
-        exit 1
-    fi
-
-    # wait for status to be not "in progress" any more
-    request_status="in progress"
-    while [[ "$request_status" == "in progress" ]]; do
-        echo -n "waiting... "
-        sleep 10
-        request_status=$(requeststatus "$requestUUID")
-        echo "$request_status"
-    done
-
-    # print status information
-    xcrun altool --notarization-info "$requestUUID" \
-                 --username "${DEV_ACCOUNT}" \
-                 --password "${NOTARY_PASS}"
-    echo
-
-    if [[ $request_status != "success" ]]; then
-        echo "## could not notarize $filepath"
-        exit 1
-    fi
-}
-
+# NOTARY_PASS="" # Store as a repo secret
+XCODE_PATH="/Applications/Xcode_13.2.1.app"
+XCODE_NOTARY_PATH="$XCODE_PATH/Contents/Developer/usr/bin/notarytool"
+XCODE_STAPLER_PATH="$XCODE_PATH/Contents/Developer/usr/bin/stapler"
 
 # Sanity Checks
 ## Type Check
@@ -133,6 +76,9 @@ CONSOLEUSER=$(/usr/bin/stat -f "%Su" /dev/console)
 RP_ZIP="/tmp/relocatable-python.zip"
 MP_ZIP="/tmp/munki-pkg.zip"
 echo "Creating Python Framework - $TYPE"
+
+# Setup notary item
+$XCODE_NOTARY_PATH store-credentials --apple-id "macadmins@cleverdevops.com" --team-id "9GQZ7KUFR6" --password "$NOTARY_PASS" macadminpython
 
 # Create framework path if not present with 777 so sudo is not needed
 if [ ! -d "${FRAMEWORKDIR}" ]; then
@@ -305,8 +251,8 @@ SIGNED_JSONFILE
   else
     # Notarize and staple the package
     # If these fail, it will bail on the entire process
-    notarizefile "$TOOLSDIR/$TYPE/build/python_${TYPE}_signed-$PYTHON_VERSION.$DATE.pkg" "org.macadmins.python.$TYPE"
-    xcrun stapler staple "$TOOLSDIR/$TYPE/build/python_${TYPE}_signed-$PYTHON_VERSION.$DATE.pkg"
+    $XCODE_NOTARY_PATH submit "$TOOLSDIR/$TYPE/build/python_${TYPE}_signed-$PYTHON_VERSION.$DATE.pkg" --keychain-profile "macadminpython" --wait
+    $XCODE_STAPLER_PATH staple "$TOOLSDIR/$TYPE/build/python_${TYPE}_signed-$PYTHON_VERSION.$DATE.pkg"
     # Move the signed + notarized pkg
     /bin/mv "$TOOLSDIR/$TYPE/build/python_${TYPE}_signed-$PYTHON_VERSION.$DATE.pkg" "$OUTPUTSDIR"
   fi
