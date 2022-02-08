@@ -7,7 +7,7 @@
 
 # Harcoded versions
 RP_SHA="06b3052afe49c400aa4196f2aada15c0992e3725"
-MP_SHA="71c57fcfdf43692adcd41fa7305be08f66bae3e5"
+MP_SHA="0fcd47faf0fb2b4e8a0256a77be315a3cb6ab319"
 MACOS_VERSION=11 # use 10.9 for non-universal
 PYTHON_PRERELEASE_VERSION=
 PYTHON_BASEURL="https://www.python.org/ftp/python/%s/python-%s${PYTHON_PRERELEASE_VERSION}-macos%s.pkg"
