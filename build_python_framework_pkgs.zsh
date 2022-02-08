@@ -18,6 +18,10 @@ RP_BINDIR="/tmp/relocatable-python"
 MP_BINDIR="/tmp/munki-pkg"
 CONSOLEUSER=$(/usr/bin/stat -f "%Su" /dev/console)
 PIPCACHEDIR="/Users/${CONSOLEUSER}/Library/Caches/pip"
+# NOTARY_PASS="" # Store as a repo secret
+XCODE_PATH="/Applications/Xcode_13.2.1.app"
+XCODE_NOTARY_PATH="$XCODE_PATH/Contents/Developer/usr/bin/notarytool"
+XCODE_STAPLER_PATH="$XCODE_PATH/Contents/Developer/usr/bin/stapler"
 
 # Sanity Checks
 ## Type Check
@@ -72,6 +76,9 @@ CONSOLEUSER=$(/usr/bin/stat -f "%Su" /dev/console)
 RP_ZIP="/tmp/relocatable-python.zip"
 MP_ZIP="/tmp/munki-pkg.zip"
 echo "Creating Python Framework - $TYPE"
+
+# Setup notary item
+$XCODE_NOTARY_PATH store-credentials --apple-id "macadmins@cleverdevops.com" --team-id "9GQZ7KUFR6" --password "$NOTARY_PASS" macadminpython
 
 # Create framework path if not present with 777 so sudo is not needed
 if [ ! -d "${FRAMEWORKDIR}" ]; then
@@ -242,7 +249,11 @@ SIGNED_JSONFILE
   if [ "${PKG_RESULT}" != "0" ]; then
     echo "Could not sign package: ${PKG_RESULT}" 1>&2
   else
-    # Move the signed pkg
+    # Notarize and staple the package
+    # If these fail, it will bail on the entire process
+    $XCODE_NOTARY_PATH submit "$TOOLSDIR/$TYPE/build/python_${TYPE}_signed-$PYTHON_VERSION.$DATE.pkg" --keychain-profile "macadminpython" --wait
+    $XCODE_STAPLER_PATH staple "$TOOLSDIR/$TYPE/build/python_${TYPE}_signed-$PYTHON_VERSION.$DATE.pkg"
+    # Move the signed + notarized pkg
     /bin/mv "$TOOLSDIR/$TYPE/build/python_${TYPE}_signed-$PYTHON_VERSION.$DATE.pkg" "$OUTPUTSDIR"
   fi
 else

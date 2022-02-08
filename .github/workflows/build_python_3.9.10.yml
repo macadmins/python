@@ -33,6 +33,8 @@ jobs:
         p12-password: ${{ secrets.CERTIFICATES_P12_PASSWORD }}
 
     - name: Run build package script
+      env:
+        NOTARY_PASS: ${{ secrets.NOTARY_PASS }}
       run: ./build_python_framework_pkgs.zsh "$TYPE" "$DEV_ID" "$PYTHON_VERSION" "${BUILD_DATE}"
 
     - name: Create Release
