@@ -242,6 +242,7 @@ if [ -n "$2" ]; then
     "version": "$PYTHON_VERSION.$DATE",
     "name": "python_${TYPE}_signed-$PYTHON_VERSION.$DATE.pkg",
     "install_location": "/",
+    "preserve_xattr": true,
     "signing_info": {
       "identity": "$2",
       "timestamp": true
