@@ -6,8 +6,8 @@
 # Run this with your current directory being the path where this script is located
 
 # Harcoded versions
-RP_SHA="93f3fea5290b761b1c25c15f46f7c76641d94d58"
-MP_SHA="71c57fcfdf43692adcd41fa7305be08f66bae3e5"
+RP_SHA="06b3052afe49c400aa4196f2aada15c0992e3725"
+MP_SHA="0fcd47faf0fb2b4e8a0256a77be315a3cb6ab319"
 MACOS_VERSION=11 # use 10.9 for non-universal
 PYTHON_PRERELEASE_VERSION=
 PYTHON_BASEURL="https://www.python.org/ftp/python/%s/python-%s${PYTHON_PRERELEASE_VERSION}-macos%s.pkg"
@@ -18,7 +18,6 @@ RP_BINDIR="/tmp/relocatable-python"
 MP_BINDIR="/tmp/munki-pkg"
 CONSOLEUSER=$(/usr/bin/stat -f "%Su" /dev/console)
 PIPCACHEDIR="/Users/${CONSOLEUSER}/Library/Caches/pip"
-# NOTARY_PASS="" # Store as a repo secret
 XCODE_PATH="/Applications/Xcode_13.2.1.app"
 XCODE_NOTARY_PATH="$XCODE_PATH/Contents/Developer/usr/bin/notarytool"
 XCODE_STAPLER_PATH="$XCODE_PATH/Contents/Developer/usr/bin/stapler"
@@ -49,22 +48,19 @@ else
   echo ""
   echo "        recommended"
   echo "          A python framework with libraries for commonly used tools like autopkg and munki"
-  echo ""
-  echo "        opionated"
-  echo "          A python framework with libraries for as many macadmin tools as possible"
   exit 1
 fi
 
-if [ -n "$3" ]; then
-  PYTHON_VERSION=$3
+if [ -n "$4" ]; then
+  PYTHON_VERSION=$4
 else
-  PYTHON_VERSION=3.9.5
+  PYTHON_VERSION=3.9.10
 fi
 # Set python bin version based on PYTHON_VERSION
 PYTHON_BIN_VERSION="${PYTHON_VERSION%.*}"
 
-if [ -n "$4" ]; then
-  DATE=$4
+if [ -n "$5" ]; then
+  DATE=$5
 else
   DATE=$(/bin/date -u "+%m%d%Y%H%M%S")
 fi
@@ -76,9 +72,6 @@ CONSOLEUSER=$(/usr/bin/stat -f "%Su" /dev/console)
 RP_ZIP="/tmp/relocatable-python.zip"
 MP_ZIP="/tmp/munki-pkg.zip"
 echo "Creating Python Framework - $TYPE"
-
-# Setup notary item
-$XCODE_NOTARY_PATH store-credentials --apple-id "macadmins@cleverdevops.com" --team-id "9GQZ7KUFR6" --password "$NOTARY_PASS" macadminpython
 
 # Create framework path if not present with 777 so sudo is not needed
 if [ ! -d "${FRAMEWORKDIR}" ]; then
@@ -118,11 +111,11 @@ fi
 # remove existing Python package folders and recreate
 if [ -d "$TOOLSDIR/$TYPE" ]; then
     /bin/rm -rf "$TOOLSDIR/$TYPE"
-    /bin/mkdir -p "$TOOLSDIR/$TYPE/payload/${FRAMEWORKDIR}"
+    /bin/mkdir -p "$TOOLSDIR/$TYPE/payload${FRAMEWORKDIR}"
     /bin/mkdir -p "$TOOLSDIR/$TYPE/payload/usr/local/bin"
     /usr/bin/sudo /usr/sbin/chown -R ${CONSOLEUSER}:wheel "$TOOLSDIR/$TYPE"
 else
-  /bin/mkdir -p "$TOOLSDIR/$TYPE/payload/${FRAMEWORKDIR}"
+  /bin/mkdir -p "$TOOLSDIR/$TYPE/payload${FRAMEWORKDIR}"
   /bin/mkdir -p "$TOOLSDIR/$TYPE/payload/usr/local/bin"
   /usr/bin/sudo /usr/sbin/chown -R ${CONSOLEUSER}:wheel "$TOOLSDIR/$TYPE"
 fi
@@ -134,6 +127,7 @@ RP_EXTRACT_BINDIR="${RP_BINDIR}/relocatable-python-${RP_SHA}"
 --python-version "${PYTHON_VERSION}" \
 --os-version "${MACOS_VERSION}" \
 --upgrade-pip \
+--no-unsign \
 --pip-requirements "${TOOLSDIR}/requirements_${TYPE}.txt" \
 --destination "${FRAMEWORKDIR}"
 
@@ -145,19 +139,30 @@ fi
 
 # move the framework to the Python package folder
 echo "Moving Python.framework to payload folder"
-/bin/mv "${FRAMEWORKDIR}/Python.framework" "$TOOLSDIR/$TYPE/payload/${FRAMEWORKDIR}/Python3.framework"
+/bin/mv "${FRAMEWORKDIR}/Python.framework" "$TOOLSDIR/$TYPE/payload${FRAMEWORKDIR}/Python3.framework"
 
-# ad-hoc re-sign the framework so it will run on Apple Silicon
-echo "Adding ad-hoc code signing so the framework will run on Apple Silicon..."
-/usr/bin/codesign -s - --deep --force --preserve-metadata=identifier,entitlements,flags,runtime "$TOOLSDIR/$TYPE/payload/${FRAMEWORKDIR}/Python3.framework/Versions/${PYTHON_BIN_VERSION}/Resources/Python.app"
-/usr/bin/codesign -s - --force --preserve-metadata=identifier,entitlements,flags,runtime "$TOOLSDIR/$TYPE/payload/${FRAMEWORKDIR}/Python3.framework/Versions/Current/Python"
-/usr/bin/find "$TOOLSDIR/$TYPE/payload/${FRAMEWORKDIR}/Python3.framework/Versions/Current/bin/" -type f -perm -u=x -exec /usr/bin/codesign -s - --preserve-metadata=identifier,entitlements,flags,runtime -f {} \;
-/usr/bin/find "$TOOLSDIR/$TYPE/payload/${FRAMEWORKDIR}/Python3.framework/Versions/Current/lib/" -type f -perm -u=x -exec /usr/bin/codesign -s - --preserve-metadata=identifier,entitlements,flags,runtime -f {} \;
-/usr/bin/find "$TOOLSDIR/$TYPE/payload/${FRAMEWORKDIR}/Python3.framework/Versions/Current/lib/" -type f -name "*dylib" -exec /usr/bin/codesign -s - --preserve-metadata=identifier,entitlements,flags,runtime -f {} \;
+# re-sign the framework so it will run on Apple Silicon
+if [ -n "$3" ]; then
+  echo "Adding developer id code signing so the framework will run on Apple Silicon..."
+  /usr/bin/find "$TOOLSDIR/$TYPE/payload${FRAMEWORKDIR}/Python3.framework/Versions/${PYTHON_BIN_VERSION}/bin" -type f -perm -u=x -exec /usr/bin/codesign --sign "$3" --timestamp --preserve-metadata=identifier,entitlements,flags,runtime -f {} \;
+  /usr/bin/find "$TOOLSDIR/$TYPE/payload${FRAMEWORKDIR}/Python3.framework/Versions/${PYTHON_BIN_VERSION}/lib" -type f -perm -u=x -exec /usr/bin/codesign --sign "$3" --timestamp --preserve-metadata=identifier,entitlements,flags,runtime -f {} \;
+  /usr/bin/find "$TOOLSDIR/$TYPE/payload${FRAMEWORKDIR}/Python3.framework/Versions/${PYTHON_BIN_VERSION}/lib" -type f -name "*dylib" -exec /usr/bin/codesign --sign "$3" --timestamp --preserve-metadata=identifier,entitlements,flags,runtime -f {} \;
+  /usr/bin/codesign --sign "$3" --timestamp --deep --force --preserve-metadata=identifier,entitlements,flags,runtime "$TOOLSDIR/$TYPE/payload${FRAMEWORKDIR}/Python3.framework/Versions/${PYTHON_BIN_VERSION}/Resources/Python.app"
+  /usr/bin/codesign --sign "$3" --timestamp --force --preserve-metadata=identifier,entitlements,flags,runtime "$TOOLSDIR/$TYPE/payload${FRAMEWORKDIR}/Python3.framework/Versions/${PYTHON_BIN_VERSION}/Python"
+  /usr/bin/codesign --sign "$3" --timestamp --force --preserve-metadata=identifier,entitlements,flags,runtime "$TOOLSDIR/$TYPE/payload${FRAMEWORKDIR}/Python3.framework/Versions/Current/Python"
+else
+  echo "Adding ad-hoc code signing so the framework will run on Apple Silicon..."
+  /usr/bin/find "$TOOLSDIR/$TYPE/payload${FRAMEWORKDIR}/Python3.framework/Versions/${PYTHON_BIN_VERSION}/bin" -type f -perm -u=x -exec /usr/bin/codesign -s - --preserve-metadata=identifier,entitlements,flags,runtime -f {} \;
+  /usr/bin/find "$TOOLSDIR/$TYPE/payload${FRAMEWORKDIR}/Python3.framework/Versions/${PYTHON_BIN_VERSION}/lib" -type f -perm -u=x -exec /usr/bin/codesign -s - --preserve-metadata=identifier,entitlements,flags,runtime -f {} \;
+  /usr/bin/find "$TOOLSDIR/$TYPE/payload${FRAMEWORKDIR}/Python3.framework/Versions/${PYTHON_BIN_VERSION}/lib" -type f -name "*dylib" -exec /usr/bin/codesign -s - --preserve-metadata=identifier,entitlements,flags,runtime -f {} \;
+  /usr/bin/codesign -s - --deep --force --preserve-metadata=identifier,entitlements,flags,runtime "$TOOLSDIR/$TYPE/payload${FRAMEWORKDIR}/Python3.framework/Versions/${PYTHON_BIN_VERSION}/Resources/Python.app"
+  /usr/bin/codesign -s - --force --preserve-metadata=identifier,entitlements,flags,runtime "$TOOLSDIR/$TYPE/payload${FRAMEWORKDIR}/Python3.framework/Versions/${PYTHON_BIN_VERSION}/Python"
+  /usr/bin/codesign -s - --force --preserve-metadata=identifier,entitlements,flags,runtime "$TOOLSDIR/$TYPE/payload${FRAMEWORKDIR}Python3.framework/Versions/Current/Python"
+fi
 
 # confirm truly universal
-TOTAL_DYLIB=$(/usr/bin/find "$TOOLSDIR/$TYPE/payload/${FRAMEWORKDIR}/Python3.framework/Versions/Current/lib" -name "*.dylib" | /usr/bin/wc -l | /usr/bin/xargs)
-UNIVERSAL_DYLIB=$(/usr/bin/find "$TOOLSDIR/$TYPE/payload/${FRAMEWORKDIR}/Python3.framework/Versions/Current/lib" -name "*.dylib" | /usr/bin/xargs file | /usr/bin/grep "2 architectures" | /usr/bin/wc -l | /usr/bin/xargs)
+TOTAL_DYLIB=$(/usr/bin/find "$TOOLSDIR/$TYPE/payload${FRAMEWORKDIR}/Python3.framework/Versions/${PYTHON_BIN_VERSION}/lib" -name "*.dylib" | /usr/bin/wc -l | /usr/bin/xargs)
+UNIVERSAL_DYLIB=$(/usr/bin/find "$TOOLSDIR/$TYPE/payload${FRAMEWORKDIR}/Python3.framework/Versions/${PYTHON_BIN_VERSION}/lib" -name "*.dylib" | /usr/bin/xargs file | /usr/bin/grep "2 architectures" | /usr/bin/wc -l | /usr/bin/xargs)
 if [ "${TOTAL_DYLIB}" != "${UNIVERSAL_DYLIB}" ] ; then
   echo "Dynamic Libraries do not match, resulting in a non-universal Python framework."
   echo "Total Dynamic Libraries found: ${TOTAL_DYLIB}"
@@ -167,19 +172,23 @@ fi
 
 echo "Dynamic Libraries are confirmed as universal"
 
-TOTAL_SO=$(/usr/bin/find "$TOOLSDIR/$TYPE/payload/${FRAMEWORKDIR}/Python3.framework/Versions/Current/lib" -name "*.so" | /usr/bin/wc -l | /usr/bin/xargs)
-UNIVERSAL_SO=$(/usr/bin/find "$TOOLSDIR/$TYPE/payload/${FRAMEWORKDIR}/Python3.framework/Versions/Current/lib" -name "*.so" | /usr/bin/xargs file | /usr/bin/grep "2 architectures" | /usr/bin/wc -l | /usr/bin/xargs)
+TOTAL_SO=$(/usr/bin/find "$TOOLSDIR/$TYPE/payload${FRAMEWORKDIR}/Python3.framework/Versions/${PYTHON_BIN_VERSION}/lib" -name "*.so" | /usr/bin/wc -l | /usr/bin/xargs)
+UNIVERSAL_SO=$(/usr/bin/find "$TOOLSDIR/$TYPE/payload${FRAMEWORKDIR}/Python3.framework/Versions/${PYTHON_BIN_VERSION}/lib" -name "*.so" | /usr/bin/xargs file | /usr/bin/grep "2 architectures" | /usr/bin/wc -l | /usr/bin/xargs)
 if [ "${TOTAL_SO}" != "${UNIVERSAL_SO}" ] ; then
   echo "Shared objects do not match, resulting in a non-universal Python framework."
   echo "Total shared objects found: ${TOTAL_SO}"
   echo "Universal shared objects found: ${UNIVERSAL_SO}"
-  UNIVERSAL_SO_ARRAY=("${(@f)$(/usr/bin/find "$TOOLSDIR/$TYPE/payload/${FRAMEWORKDIR}/Python3.framework/Versions/Current/lib" -name "*.so" | /usr/bin/xargs file | /usr/bin/grep "2 architectures"  | awk '{print $1;}' | sed 's/:*$//g')}")
-  TOTAL_SO_ARRAY=("${(@f)$(/usr/bin/find "$TOOLSDIR/$TYPE/payload/${FRAMEWORKDIR}/Python3.framework/Versions/Current/lib" -name "*.so" )}")
+  UNIVERSAL_SO_ARRAY=("${(@f)$(/usr/bin/find "$TOOLSDIR/$TYPE/payload${FRAMEWORKDIR}/Python3.framework/Versions/${PYTHON_BIN_VERSION}/lib" -name "*.so" | /usr/bin/xargs file | /usr/bin/grep "2 architectures"  | awk '{print $1;}' | sed 's/:*$//g')}")
+  TOTAL_SO_ARRAY=("${(@f)$(/usr/bin/find "$TOOLSDIR/$TYPE/payload${FRAMEWORKDIR}/Python3.framework/Versions/${PYTHON_BIN_VERSION}/lib" -name "*.so" )}")
   echo ${TOTAL_SO_ARRAY[@]} ${UNIVERSAL_SO_ARRAY[@]} | tr ' ' '\n' | sort | uniq -u
   exit 1
 fi
 
 echo "Shared objects are confirmed as universal"
+
+# Print out some information about the signatures
+/usr/sbin/spctl -a -vvvv "$TOOLSDIR/$TYPE/payload${FRAMEWORKDIR}/Python3.framework/Versions/${PYTHON_BIN_VERSION}/Python"
+/usr/sbin/spctl -a -vvvv "$TOOLSDIR/$TYPE/payload${FRAMEWORKDIR}/Python3.framework/Versions/${PYTHON_BIN_VERSION}/lib/libssl.1.1.dylib"
 
 # make a symbolic link to help with interactive use
 /bin/ln -s "$PYTHON_BIN" "$TOOLSDIR/$TYPE/payload/usr/local/bin/managed_python3"
@@ -237,6 +246,7 @@ if [ -n "$2" ]; then
     "version": "$PYTHON_VERSION.$DATE",
     "name": "python_${TYPE}_signed-$PYTHON_VERSION.$DATE.pkg",
     "install_location": "/",
+    "preserve_xattr": true,
     "signing_info": {
       "identity": "$2",
       "timestamp": true
@@ -249,10 +259,13 @@ SIGNED_JSONFILE
   if [ "${PKG_RESULT}" != "0" ]; then
     echo "Could not sign package: ${PKG_RESULT}" 1>&2
   else
-    # Notarize and staple the package
-    # If these fail, it will bail on the entire process
-    $XCODE_NOTARY_PATH submit "$TOOLSDIR/$TYPE/build/python_${TYPE}_signed-$PYTHON_VERSION.$DATE.pkg" --keychain-profile "macadminpython" --wait
-    $XCODE_STAPLER_PATH staple "$TOOLSDIR/$TYPE/build/python_${TYPE}_signed-$PYTHON_VERSION.$DATE.pkg"
+    if [ -n "$6" ]; then
+      # Notarize and staple the package
+      $XCODE_NOTARY_PATH store-credentials --apple-id "macadmins@cleverdevops.com" --team-id "9GQZ7KUFR6" --password "$NOTARY_PASS" macadminpython
+      # If these fail, it will bail on the entire process
+      $XCODE_NOTARY_PATH submit "$TOOLSDIR/$TYPE/build/python_${TYPE}_signed-$PYTHON_VERSION.$DATE.pkg" --keychain-profile "macadminpython" --wait
+      $XCODE_STAPLER_PATH staple "$TOOLSDIR/$TYPE/build/python_${TYPE}_signed-$PYTHON_VERSION.$DATE.pkg"
+    fi
     # Move the signed + notarized pkg
     /bin/mv "$TOOLSDIR/$TYPE/build/python_${TYPE}_signed-$PYTHON_VERSION.$DATE.pkg" "$OUTPUTSDIR"
   fi
@@ -262,7 +275,7 @@ fi
 
 # Zip and move the framework
 ZIPFILE="Python3.framework_$TYPE-$PYTHON_VERSION.$DATE.zip"
-/usr/bin/ditto -c -k --sequesterRsrc "$TOOLSDIR/$TYPE/payload/${FRAMEWORKDIR}/" ${ZIPFILE}
+/usr/bin/ditto -c -k --sequesterRsrc "$TOOLSDIR/$TYPE/payload${FRAMEWORKDIR}/" ${ZIPFILE}
 /bin/mv ${ZIPFILE} "$OUTPUTSDIR"
 
 # Ensure outputs directory is owned by the current user
