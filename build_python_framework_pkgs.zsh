@@ -144,23 +144,25 @@ echo "Moving Python.framework to payload folder"
 # re-sign the framework so it will run on Apple Silicon
 if [ -n "$3" ]; then
   echo "Adding developer id code signing so the framework will run on Apple Silicon..."
-  /usr/bin/codesign --sign "$3" --timestamp --deep --force --preserve-metadata=identifier,entitlements,flags,runtime "$TOOLSDIR/$TYPE/payload/${FRAMEWORKDIR}/Python3.framework/Versions/${PYTHON_BIN_VERSION}/Resources/Python.app"
-  /usr/bin/codesign --sign "$3" --timestamp --force --preserve-metadata=identifier,entitlements,flags,runtime "$TOOLSDIR/$TYPE/payload/${FRAMEWORKDIR}/Python3.framework/Versions/${PYTHON_BIN_VERSION}/Python"
-  /usr/bin/find "$TOOLSDIR/$TYPE/payload/${FRAMEWORKDIR}/Python3.framework/Versions/Current/bin/" -type f -perm -u=x -exec /usr/bin/codesign --sign "$3" --timestamp --preserve-metadata=identifier,entitlements,flags,runtime -f {} \;
-  /usr/bin/find "$TOOLSDIR/$TYPE/payload/${FRAMEWORKDIR}/Python3.framework/Versions/Current/lib/" -type f -perm -u=x -exec /usr/bin/codesign --sign "$3" --timestamp --preserve-metadata=identifier,entitlements,flags,runtime -f {} \;
-  /usr/bin/find "$TOOLSDIR/$TYPE/payload/${FRAMEWORKDIR}/Python3.framework/Versions/Current/lib/" -type f -name "*dylib" -exec /usr/bin/codesign --sign "$3" --timestamp --preserve-metadata=identifier,entitlements,flags,runtime -f {} \;
+  /usr/bin/codesign --sign "$3" --timestamp --deep --force --preserve-metadata=identifier,entitlements,flags,runtime "$TOOLSDIR/$TYPE/payload${FRAMEWORKDIR}/Python3.framework/Versions/${PYTHON_BIN_VERSION}/Resources/Python.app"
+  /usr/bin/codesign --sign "$3" --timestamp --force --preserve-metadata=identifier,entitlements,flags,runtime "$TOOLSDIR/$TYPE/payload${FRAMEWORKDIR}/Python3.framework/Versions/${PYTHON_BIN_VERSION}/Python"
+  /usr/bin/codesign --sign "$3" --timestamp --force --preserve-metadata=identifier,entitlements,flags,runtime "$TOOLSDIR/$TYPE/payload/${FRAMEWORKDIR}/Python3.framework/Versions/Current/Python"
+  /usr/bin/find "$TOOLSDIR/$TYPE/payload${FRAMEWORKDIR}/Python3.framework/Versions/${PYTHON_BIN_VERSION}/bin" -type f -perm -u=x -exec /usr/bin/codesign --sign "$3" --timestamp --preserve-metadata=identifier,entitlements,flags,runtime -f {} \;
+  /usr/bin/find "$TOOLSDIR/$TYPE/payload${FRAMEWORKDIR}/Python3.framework/Versions/${PYTHON_BIN_VERSION}/lib" -type f -perm -u=x -exec /usr/bin/codesign --sign "$3" --timestamp --preserve-metadata=identifier,entitlements,flags,runtime -f {} \;
+  /usr/bin/find "$TOOLSDIR/$TYPE/payload${FRAMEWORKDIR}/Python3.framework/Versions/${PYTHON_BIN_VERSION}/lib" -type f -name "*dylib" -exec /usr/bin/codesign --sign "$3" --timestamp --preserve-metadata=identifier,entitlements,flags,runtime -f {} \;
 else
   echo "Adding ad-hoc code signing so the framework will run on Apple Silicon..."
-  /usr/bin/codesign -s - --deep --force --preserve-metadata=identifier,entitlements,flags,runtime "$TOOLSDIR/$TYPE/payload/${FRAMEWORKDIR}/Python3.framework/Versions/${PYTHON_BIN_VERSION}/Resources/Python.app"
-  /usr/bin/codesign -s - --force --preserve-metadata=identifier,entitlements,flags,runtime "$TOOLSDIR/$TYPE/payload/${FRAMEWORKDIR}/Python3.framework/Versions/${PYTHON_BIN_VERSION}/Python"
-  /usr/bin/find "$TOOLSDIR/$TYPE/payload/${FRAMEWORKDIR}/Python3.framework/Versions/Current/bin/" -type f -perm -u=x -exec /usr/bin/codesign -s - --preserve-metadata=identifier,entitlements,flags,runtime -f {} \;
-  /usr/bin/find "$TOOLSDIR/$TYPE/payload/${FRAMEWORKDIR}/Python3.framework/Versions/Current/lib/" -type f -perm -u=x -exec /usr/bin/codesign -s - --preserve-metadata=identifier,entitlements,flags,runtime -f {} \;
-  /usr/bin/find "$TOOLSDIR/$TYPE/payload/${FRAMEWORKDIR}/Python3.framework/Versions/Current/lib/" -type f -name "*dylib" -exec /usr/bin/codesign -s - --preserve-metadata=identifier,entitlements,flags,runtime -f {} \;
+  /usr/bin/codesign -s - --deep --force --preserve-metadata=identifier,entitlements,flags,runtime "$TOOLSDIR/$TYPE/payload${FRAMEWORKDIR}/Python3.framework/Versions/${PYTHON_BIN_VERSION}/Resources/Python.app"
+  /usr/bin/codesign -s - --force --preserve-metadata=identifier,entitlements,flags,runtime "$TOOLSDIR/$TYPE/payload${FRAMEWORKDIR}/Python3.framework/Versions/${PYTHON_BIN_VERSION}/Python"
+  /usr/bin/codesign -s - --force --preserve-metadata=identifier,entitlements,flags,runtime "$TOOLSDIR/$TYPE/payload/${FRAMEWORKDIR}/Python3.framework/Versions/Current/Python"
+  /usr/bin/find "$TOOLSDIR/$TYPE/payload${FRAMEWORKDIR}/Python3.framework/Versions/${PYTHON_BIN_VERSION}/bin" -type f -perm -u=x -exec /usr/bin/codesign -s - --preserve-metadata=identifier,entitlements,flags,runtime -f {} \;
+  /usr/bin/find "$TOOLSDIR/$TYPE/payload${FRAMEWORKDIR}/Python3.framework/Versions/${PYTHON_BIN_VERSION}/lib" -type f -perm -u=x -exec /usr/bin/codesign -s - --preserve-metadata=identifier,entitlements,flags,runtime -f {} \;
+  /usr/bin/find "$TOOLSDIR/$TYPE/payload${FRAMEWORKDIR}/Python3.framework/Versions/${PYTHON_BIN_VERSION}/lib" -type f -name "*dylib" -exec /usr/bin/codesign -s - --preserve-metadata=identifier,entitlements,flags,runtime -f {} \;
 fi
 
 # confirm truly universal
-TOTAL_DYLIB=$(/usr/bin/find "$TOOLSDIR/$TYPE/payload/${FRAMEWORKDIR}/Python3.framework/Versions/Current/lib" -name "*.dylib" | /usr/bin/wc -l | /usr/bin/xargs)
-UNIVERSAL_DYLIB=$(/usr/bin/find "$TOOLSDIR/$TYPE/payload/${FRAMEWORKDIR}/Python3.framework/Versions/Current/lib" -name "*.dylib" | /usr/bin/xargs file | /usr/bin/grep "2 architectures" | /usr/bin/wc -l | /usr/bin/xargs)
+TOTAL_DYLIB=$(/usr/bin/find "$TOOLSDIR/$TYPE/payload/${FRAMEWORKDIR}/Python3.framework/Versions/${PYTHON_BIN_VERSION}/lib" -name "*.dylib" | /usr/bin/wc -l | /usr/bin/xargs)
+UNIVERSAL_DYLIB=$(/usr/bin/find "$TOOLSDIR/$TYPE/payload/${FRAMEWORKDIR}/Python3.framework/Versions/${PYTHON_BIN_VERSION}/lib" -name "*.dylib" | /usr/bin/xargs file | /usr/bin/grep "2 architectures" | /usr/bin/wc -l | /usr/bin/xargs)
 if [ "${TOTAL_DYLIB}" != "${UNIVERSAL_DYLIB}" ] ; then
   echo "Dynamic Libraries do not match, resulting in a non-universal Python framework."
   echo "Total Dynamic Libraries found: ${TOTAL_DYLIB}"
@@ -170,14 +172,14 @@ fi
 
 echo "Dynamic Libraries are confirmed as universal"
 
-TOTAL_SO=$(/usr/bin/find "$TOOLSDIR/$TYPE/payload/${FRAMEWORKDIR}/Python3.framework/Versions/Current/lib" -name "*.so" | /usr/bin/wc -l | /usr/bin/xargs)
-UNIVERSAL_SO=$(/usr/bin/find "$TOOLSDIR/$TYPE/payload/${FRAMEWORKDIR}/Python3.framework/Versions/Current/lib" -name "*.so" | /usr/bin/xargs file | /usr/bin/grep "2 architectures" | /usr/bin/wc -l | /usr/bin/xargs)
+TOTAL_SO=$(/usr/bin/find "$TOOLSDIR/$TYPE/payload/${FRAMEWORKDIR}/Python3.framework/Versions/${PYTHON_BIN_VERSION}/lib" -name "*.so" | /usr/bin/wc -l | /usr/bin/xargs)
+UNIVERSAL_SO=$(/usr/bin/find "$TOOLSDIR/$TYPE/payload/${FRAMEWORKDIR}/Python3.framework/Versions/${PYTHON_BIN_VERSION}/lib" -name "*.so" | /usr/bin/xargs file | /usr/bin/grep "2 architectures" | /usr/bin/wc -l | /usr/bin/xargs)
 if [ "${TOTAL_SO}" != "${UNIVERSAL_SO}" ] ; then
   echo "Shared objects do not match, resulting in a non-universal Python framework."
   echo "Total shared objects found: ${TOTAL_SO}"
   echo "Universal shared objects found: ${UNIVERSAL_SO}"
-  UNIVERSAL_SO_ARRAY=("${(@f)$(/usr/bin/find "$TOOLSDIR/$TYPE/payload/${FRAMEWORKDIR}/Python3.framework/Versions/Current/lib" -name "*.so" | /usr/bin/xargs file | /usr/bin/grep "2 architectures"  | awk '{print $1;}' | sed 's/:*$//g')}")
-  TOTAL_SO_ARRAY=("${(@f)$(/usr/bin/find "$TOOLSDIR/$TYPE/payload/${FRAMEWORKDIR}/Python3.framework/Versions/Current/lib" -name "*.so" )}")
+  UNIVERSAL_SO_ARRAY=("${(@f)$(/usr/bin/find "$TOOLSDIR/$TYPE/payload/${FRAMEWORKDIR}/Python3.framework/Versions/${PYTHON_BIN_VERSION}/lib" -name "*.so" | /usr/bin/xargs file | /usr/bin/grep "2 architectures"  | awk '{print $1;}' | sed 's/:*$//g')}")
+  TOTAL_SO_ARRAY=("${(@f)$(/usr/bin/find "$TOOLSDIR/$TYPE/payload/${FRAMEWORKDIR}/Python3.framework/Versions/${PYTHON_BIN_VERSION}/lib" -name "*.so" )}")
   echo ${TOTAL_SO_ARRAY[@]} ${UNIVERSAL_SO_ARRAY[@]} | tr ' ' '\n' | sort | uniq -u
   exit 1
 fi
