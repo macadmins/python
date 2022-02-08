@@ -186,6 +186,10 @@ fi
 
 echo "Shared objects are confirmed as universal"
 
+# Print out some information about the signatures
+/usr/sbin/spctl -a -vvvv "$TOOLSDIR/$TYPE/payload${FRAMEWORKDIR}/Python3.framework/Versions/${PYTHON_BIN_VERSION}/Python"
+/usr/sbin/spctl -a -vvvv "$TOOLSDIR/$TYPE/payload${FRAMEWORKDIR}/Python3.framework/Versions/${PYTHON_BIN_VERSION}/lib/libssl.1.1.dylib"
+
 # make a symbolic link to help with interactive use
 /bin/ln -s "$PYTHON_BIN" "$TOOLSDIR/$TYPE/payload/usr/local/bin/managed_python3"
 
