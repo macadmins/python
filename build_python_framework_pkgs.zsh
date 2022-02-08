@@ -73,11 +73,6 @@ RP_ZIP="/tmp/relocatable-python.zip"
 MP_ZIP="/tmp/munki-pkg.zip"
 echo "Creating Python Framework - $TYPE"
 
-# Setup notary item
-if [ -n "$6" ]; then
-  $XCODE_NOTARY_PATH store-credentials --apple-id "macadmins@cleverdevops.com" --team-id "9GQZ7KUFR6" --password "$NOTARY_PASS" macadminpython
-fi
-
 # Create framework path if not present with 777 so sudo is not needed
 if [ ! -d "${FRAMEWORKDIR}" ]; then
     /usr/bin/sudo /bin/mkdir -m 777 -p "${FRAMEWORKDIR}"
@@ -132,7 +127,7 @@ RP_EXTRACT_BINDIR="${RP_BINDIR}/relocatable-python-${RP_SHA}"
 --python-version "${PYTHON_VERSION}" \
 --os-version "${MACOS_VERSION}" \
 --upgrade-pip \
---no-unsign \ 
+--no-unsign \
 --pip-requirements "${TOOLSDIR}/requirements_${TYPE}.txt" \
 --destination "${FRAMEWORKDIR}"
 
@@ -259,6 +254,7 @@ SIGNED_JSONFILE
   else
     if [ -n "$6" ]; then
       # Notarize and staple the package
+      $XCODE_NOTARY_PATH store-credentials --apple-id "macadmins@cleverdevops.com" --team-id "9GQZ7KUFR6" --password "$NOTARY_PASS" macadminpython
       # If these fail, it will bail on the entire process
       $XCODE_NOTARY_PATH submit "$TOOLSDIR/$TYPE/build/python_${TYPE}_signed-$PYTHON_VERSION.$DATE.pkg" --keychain-profile "macadminpython" --wait
       $XCODE_STAPLER_PATH staple "$TOOLSDIR/$TYPE/build/python_${TYPE}_signed-$PYTHON_VERSION.$DATE.pkg"
