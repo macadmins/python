@@ -2,7 +2,9 @@ name: Build and upload recommended package
 
 env:
   TYPE: "recommended"
-  DEV_ID: "Developer ID Installer: Clever DevOps Co. (9GQZ7KUFR6)"
+  DEV_INSTALLER_ID: "Developer ID Installer: Clever DevOps Co. (9GQZ7KUFR6)"
+  DEV_APPLICATION_ID: "Developer ID Application: Clever DevOps Co. (9GQZ7KUFR6)"
+  NOTARY_PASS: ${{ secrets.NOTARY_PASS }}
   PYTHON_VERSION: "3.9.10"
 
 on:
@@ -25,17 +27,23 @@ jobs:
     - name: Checkout python repo
       uses: actions/checkout@v2
 
-    - name: Install Apple certificates
-      if: github.ref == 'refs/heads/main'
+    - name: Install Apple Developer ID Application certificates
       uses: apple-actions/import-codesign-certs@253ddeeac23f2bdad1646faac5c8c2832e800071
       with:
+        keychain-password: ${{ secrets.KEYCHAIN_PASSWORD }}
+        p12-file-base64: ${{ secrets.DEV_APP_CERTIFICATES_P12 }}
+        p12-password: ${{ secrets.DEV_APP_CERTIFICATES_P12_PASSWORD }}
+
+    - name: Install Apple Developer ID Installer certificates
+      uses: apple-actions/import-codesign-certs@253ddeeac23f2bdad1646faac5c8c2832e800071
+      with:
+        create-keychain: false # do not create a new keychain for this value
+        keychain-password: ${{ secrets.KEYCHAIN_PASSWORD }}
         p12-file-base64: ${{ secrets.CERTIFICATES_P12 }}
         p12-password: ${{ secrets.CERTIFICATES_P12_PASSWORD }}
 
     - name: Run build package script
-      env:
-        NOTARY_PASS: ${{ secrets.NOTARY_PASS }}
-      run: ./build_python_framework_pkgs.zsh "$TYPE" "$DEV_ID" "$PYTHON_VERSION" "${BUILD_DATE}"
+      run: ./build_python_framework_pkgs.zsh "$TYPE" "$DEV_INSTALLER_ID" "$DEV_APPLICATION_ID" "$PYTHON_VERSION" "${BUILD_DATE}" "${NOTARY_PASS}"
 
     - name: Create Release
       if: github.ref == 'refs/heads/main'
