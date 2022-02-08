@@ -145,14 +145,14 @@ echo "Moving Python.framework to payload folder"
 if [ -n "$3" ]; then
   echo "Adding developer id code signing so the framework will run on Apple Silicon..."
   /usr/bin/codesign --sign "$3" --timestamp --deep --force --preserve-metadata=identifier,entitlements,flags,runtime "$TOOLSDIR/$TYPE/payload/${FRAMEWORKDIR}/Python3.framework/Versions/${PYTHON_BIN_VERSION}/Resources/Python.app"
-  /usr/bin/codesign --sign "$3" --timestamp --force --preserve-metadata=identifier,entitlements,flags,runtime "$TOOLSDIR/$TYPE/payload/${FRAMEWORKDIR}/Python3.framework/Versions/Current/Python"
+  /usr/bin/codesign --sign "$3" --timestamp --force --preserve-metadata=identifier,entitlements,flags,runtime "$TOOLSDIR/$TYPE/payload/${FRAMEWORKDIR}/Python3.framework/Versions/${PYTHON_BIN_VERSION}/Python"
   /usr/bin/find "$TOOLSDIR/$TYPE/payload/${FRAMEWORKDIR}/Python3.framework/Versions/Current/bin/" -type f -perm -u=x -exec /usr/bin/codesign --sign "$3" --timestamp --preserve-metadata=identifier,entitlements,flags,runtime -f {} \;
   /usr/bin/find "$TOOLSDIR/$TYPE/payload/${FRAMEWORKDIR}/Python3.framework/Versions/Current/lib/" -type f -perm -u=x -exec /usr/bin/codesign --sign "$3" --timestamp --preserve-metadata=identifier,entitlements,flags,runtime -f {} \;
   /usr/bin/find "$TOOLSDIR/$TYPE/payload/${FRAMEWORKDIR}/Python3.framework/Versions/Current/lib/" -type f -name "*dylib" -exec /usr/bin/codesign --sign "$3" --timestamp --preserve-metadata=identifier,entitlements,flags,runtime -f {} \;
 else
   echo "Adding ad-hoc code signing so the framework will run on Apple Silicon..."
   /usr/bin/codesign -s - --deep --force --preserve-metadata=identifier,entitlements,flags,runtime "$TOOLSDIR/$TYPE/payload/${FRAMEWORKDIR}/Python3.framework/Versions/${PYTHON_BIN_VERSION}/Resources/Python.app"
-  /usr/bin/codesign -s - --force --preserve-metadata=identifier,entitlements,flags,runtime "$TOOLSDIR/$TYPE/payload/${FRAMEWORKDIR}/Python3.framework/Versions/Current/Python"
+  /usr/bin/codesign -s - --force --preserve-metadata=identifier,entitlements,flags,runtime "$TOOLSDIR/$TYPE/payload/${FRAMEWORKDIR}/Python3.framework/Versions/${PYTHON_BIN_VERSION}/Python"
   /usr/bin/find "$TOOLSDIR/$TYPE/payload/${FRAMEWORKDIR}/Python3.framework/Versions/Current/bin/" -type f -perm -u=x -exec /usr/bin/codesign -s - --preserve-metadata=identifier,entitlements,flags,runtime -f {} \;
   /usr/bin/find "$TOOLSDIR/$TYPE/payload/${FRAMEWORKDIR}/Python3.framework/Versions/Current/lib/" -type f -perm -u=x -exec /usr/bin/codesign -s - --preserve-metadata=identifier,entitlements,flags,runtime -f {} \;
   /usr/bin/find "$TOOLSDIR/$TYPE/payload/${FRAMEWORKDIR}/Python3.framework/Versions/Current/lib/" -type f -name "*dylib" -exec /usr/bin/codesign -s - --preserve-metadata=identifier,entitlements,flags,runtime -f {} \;
