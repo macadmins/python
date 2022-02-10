@@ -21,6 +21,7 @@ PIPCACHEDIR="/Users/${CONSOLEUSER}/Library/Caches/pip"
 XCODE_PATH="/Applications/Xcode_13.2.1.app"
 XCODE_NOTARY_PATH="$XCODE_PATH/Contents/Developer/usr/bin/notarytool"
 XCODE_STAPLER_PATH="$XCODE_PATH/Contents/Developer/usr/bin/stapler"
+NEWSUBBUILD=$((80620 + $(git rev-parse HEAD~0 | xargs -I{} git rev-list --count {})))
 
 # Sanity Checks
 ## Type Check
@@ -54,16 +55,14 @@ fi
 if [ -n "$4" ]; then
   PYTHON_VERSION=$4
 else
-  PYTHON_VERSION=3.9.10
+  PYTHON_VERSION=3.10.2
 fi
 # Set python bin version based on PYTHON_VERSION
 PYTHON_BIN_VERSION="${PYTHON_VERSION%.*}"
+AUTOMATED_PYTHON_BUILD="$PYTHON_VERSION.$NEWSUBBUILD"
 
-if [ -n "$5" ]; then
-  DATE=$5
-else
-  DATE=$(/bin/date -u "+%m%d%Y%H%M%S")
-fi
+# Create files to use for build process info
+echo "$AUTOMATED_PYTHON_BUILD" > $TOOLSDIR/build_info.txt
 
 # Variables
 TOOLSDIR=$(dirname $0)
@@ -216,24 +215,6 @@ fi
 # Create outputs folder
 /bin/mkdir -p "$TOOLSDIR/outputs"
 
-# Create the json file for munki-pkg
-/bin/cat << JSONFILE > "$TOOLSDIR/$TYPE/build-info.json"
-{
-  "ownership": "recommended",
-  "suppress_bundle_relocation": true,
-  "identifier": "org.macadmins.python.$TYPE",
-  "postinstall_action": "none",
-  "distribution_style": true,
-  "version": "$PYTHON_VERSION.$DATE",
-  "name": "python_$TYPE-$PYTHON_VERSION.$DATE.pkg",
-  "install_location": "/"
-}
-JSONFILE
-# Create the unsigned pkg
-"${MP_BINDIR}/munki-pkg-${MP_SHA}/munkipkg" "$TOOLSDIR/$TYPE"
-# Move the unsigned pkg
-/bin/mv "$TOOLSDIR/$TYPE/build/python_$TYPE-$PYTHON_VERSION.$DATE.pkg" "$OUTPUTSDIR"
-
 if [ -n "$2" ]; then
   # Create the json file for munki-pkg (signed)
   /bin/cat << SIGNED_JSONFILE > "$TOOLSDIR/$TYPE/build-info.json"
@@ -243,8 +224,8 @@ if [ -n "$2" ]; then
     "identifier": "org.macadmins.python.$TYPE",
     "postinstall_action": "none",
     "distribution_style": true,
-    "version": "$PYTHON_VERSION.$DATE",
-    "name": "python_${TYPE}_signed-$PYTHON_VERSION.$DATE.pkg",
+    "version": "$AUTOMATED_PYTHON_BUILD",
+    "name": "python_${TYPE}_signed-$AUTOMATED_PYTHON_BUILD.pkg",
     "install_location": "/",
     "preserve_xattr": true,
     "signing_info": {
@@ -259,22 +240,22 @@ SIGNED_JSONFILE
   if [ "${PKG_RESULT}" != "0" ]; then
     echo "Could not sign package: ${PKG_RESULT}" 1>&2
   else
-    if [ -n "$6" ]; then
+    if [ -n "$5" ]; then
       # Notarize and staple the package
       $XCODE_NOTARY_PATH store-credentials --apple-id "macadmins@cleverdevops.com" --team-id "9GQZ7KUFR6" --password "$NOTARY_PASS" macadminpython
       # If these fail, it will bail on the entire process
-      $XCODE_NOTARY_PATH submit "$TOOLSDIR/$TYPE/build/python_${TYPE}_signed-$PYTHON_VERSION.$DATE.pkg" --keychain-profile "macadminpython" --wait
-      $XCODE_STAPLER_PATH staple "$TOOLSDIR/$TYPE/build/python_${TYPE}_signed-$PYTHON_VERSION.$DATE.pkg"
+      $XCODE_NOTARY_PATH submit "$TOOLSDIR/$TYPE/build/python_${TYPE}_signed-$AUTOMATED_PYTHON_BUILD.pkg" --keychain-profile "macadminpython" --wait
+      $XCODE_STAPLER_PATH staple "$TOOLSDIR/$TYPE/build/python_${TYPE}_signed-$AUTOMATED_PYTHON_BUILD.pkg"
     fi
     # Move the signed + notarized pkg
-    /bin/mv "$TOOLSDIR/$TYPE/build/python_${TYPE}_signed-$PYTHON_VERSION.$DATE.pkg" "$OUTPUTSDIR"
+    /bin/mv "$TOOLSDIR/$TYPE/build/python_${TYPE}_signed-$AUTOMATED_PYTHON_BUILD.pkg" "$OUTPUTSDIR"
   fi
 else
   echo "no signing identity passed, skipping signed package creation"
 fi
 
 # Zip and move the framework
-ZIPFILE="Python3.framework_$TYPE-$PYTHON_VERSION.$DATE.zip"
+ZIPFILE="Python3.framework_$TYPE-$AUTOMATED_PYTHON_BUILD.zip"
 /usr/bin/ditto -c -k --sequesterRsrc "$TOOLSDIR/$TYPE/payload${FRAMEWORKDIR}/" ${ZIPFILE}
 /bin/mv ${ZIPFILE} "$OUTPUTSDIR"
 

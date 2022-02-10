@@ -1,0 +1,143 @@
+name: Build and upload recommended package
+
+env:
+  TYPE: "recommended"
+  DEV_INSTALLER_ID: "Developer ID Installer: Clever DevOps Co. (9GQZ7KUFR6)"
+  DEV_APPLICATION_ID: "Developer ID Application: Clever DevOps Co. (9GQZ7KUFR6)"
+  NOTARY_PASS: ${{ secrets.NOTARY_PASS }}
+  PYTHON_VERSION: "3.10.2"
+
+on:
+  pull_request:
+  push:
+    branches:
+    - main
+
+jobs:
+  build:
+    runs-on: macos-11.0
+
+    steps:
+    - name: Checkout python repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+
+    - name: Install Apple Developer ID Application certificates
+      uses: apple-actions/import-codesign-certs@253ddeeac23f2bdad1646faac5c8c2832e800071
+      with:
+        keychain-password: ${{ secrets.KEYCHAIN_PASSWORD }}
+        p12-file-base64: ${{ secrets.DEV_APP_CERTIFICATES_P12 }}
+        p12-password: ${{ secrets.DEV_APP_CERTIFICATES_P12_PASSWORD }}
+
+    - name: Install Apple Developer ID Installer certificates
+      uses: apple-actions/import-codesign-certs@253ddeeac23f2bdad1646faac5c8c2832e800071
+      with:
+        create-keychain: false # do not create a new keychain for this value
+        keychain-password: ${{ secrets.KEYCHAIN_PASSWORD }}
+        p12-file-base64: ${{ secrets.CERTIFICATES_P12 }}
+        p12-password: ${{ secrets.CERTIFICATES_P12_PASSWORD }}
+
+    - name: Run build package script
+      run: ./build_python_framework_pkgs.zsh "$TYPE" "$DEV_INSTALLER_ID" "$DEV_APPLICATION_ID" "$PYTHON_VERSION" "${NOTARY_PASS}"
+
+    - name: get environment variables
+      id: get_env_var
+      run: |
+         echo "PYTHON_BUILD_VERSION=$(/bin/cat ./build_info.txt)" >> $GITHUB_ENV
+
+    - name: Generate changelog
+      id: changelog
+      uses: metcalfc/changelog-generator@e5306b306fa2e34f05258789e0e5c526c1bd4352 # v1.0.0
+      with:
+        myToken: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Create Release
+      if: github.ref == 'refs/heads/main'
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: v${{env.PYTHON_BUILD_VERSION}}
+        release_name: Python ${{env.PYTHON_BUILD_VERSION}}
+        body: |
+            # Notes
+            Python ${{env.PYTHON_VERSION}} Framework
+
+            ## Changes
+            **Note: Some of these updates have breaking changes. Always test your code before deploying production!**
+            - Library versions:
+              - attrs 21.4.0
+              - black 22.1.0
+              - certifi 2021.10.8
+              - cffi 1.15.0
+              - cfgv 3.3.1
+              - chardet 4.0.0
+              - click 8.0.3
+              - distlib 0.3.4
+              - filelock 3.4.2
+              - flake8-bugbear 22.1.11
+              - flake8 4.0.1
+              - identify 2.4.7
+              - idna 3.3
+              - importlib-metadata 4.10.1
+              - isort 5.10.1
+              - packaging 21.3
+              - pathspec 0.9.0
+              - pre-commit 2.17.0
+              - pycodestyle 2.8.0
+              - pycparser 2.21
+              - pyflakes 2.4.0
+              - pyobjc 8.2
+              - pyparsing 3.0.7
+              - PyYAML 6.0
+              - regex 2022.1.18
+              - requests 2.27.1
+              - tokenize-rt 4.2.0
+              - typed-ast 1.5.2
+              - urllib3 1.26.8
+              - virtualenv 20.13.0
+              - xattr 0.9.9
+              - zipp 3.7.0
+            
+            ${{ steps.changelog.outputs.changelog }}
+
+            # Flavors of Python
+            At this time, the automated build process will **only** create the Recommended package
+
+            ## Recommended
+            This is a Python.framework that contains everything from minimal, and a few libraries that various well known open source projects require.
+
+            ## Signing/Notarization
+            The signed package is fully notarized, including the Python.framework file
+        draft: false
+        prerelease: true
+
+    - name: Upload Signed Package Release Asset
+      if: github.ref == 'refs/heads/main'
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./outputs/python_${{env.TYPE}}_signed-${{env.PYTHON_BUILD_VERSION}}.pkg
+        asset_name: python_${{env.TYPE}}_signed-${{env.PYTHON_BUILD_VERSION}}.pkg
+        asset_content_type: application/x-newton-compatible-pkg
+
+    - name: Upload Python Framework Release Asset
+      if: github.ref == 'refs/heads/main'
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./outputs/Python3.framework_${{env.TYPE}}-${{env.PYTHON_BUILD_VERSION}}.zip
+        asset_name: Python3.framework_${{env.TYPE}}-${{env.PYTHON_BUILD_VERSION}}.zip
+        asset_content_type: application/zip
+
+    - name: Upload packages
+      uses: actions/upload-artifact@v2
+      with:
+        name: packages
+        path: outputs/
