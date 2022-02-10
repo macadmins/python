@@ -61,15 +61,16 @@ fi
 PYTHON_BIN_VERSION="${PYTHON_VERSION%.*}"
 AUTOMATED_PYTHON_BUILD="$PYTHON_VERSION.$NEWSUBBUILD"
 
-# Create files to use for build process info
-echo "$AUTOMATED_PYTHON_BUILD" > $TOOLSDIR/build_info.txt
-
 # Variables
 TOOLSDIR=$(dirname $0)
 OUTPUTSDIR="$TOOLSDIR/outputs"
 CONSOLEUSER=$(/usr/bin/stat -f "%Su" /dev/console)
 RP_ZIP="/tmp/relocatable-python.zip"
 MP_ZIP="/tmp/munki-pkg.zip"
+
+# Create files to use for build process info
+echo "$AUTOMATED_PYTHON_BUILD" > $TOOLSDIR/build_info.txt
+
 echo "Creating Python Framework - $TYPE"
 
 # Create framework path if not present with 777 so sudo is not needed
