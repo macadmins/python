@@ -64,12 +64,6 @@ AUTOMATED_PYTHON_BUILD="$PYTHON_VERSION.$NEWSUBBUILD"
 # Create files to use for build process info
 echo "$AUTOMATED_PYTHON_BUILD" > $TOOLSDIR/build_info.txt
 
-if [ -n "$5" ]; then
-  DATE=$5
-else
-  DATE=$(/bin/date -u "+%m%d%Y%H%M%S")
-fi
-
 # Variables
 TOOLSDIR=$(dirname $0)
 OUTPUTSDIR="$TOOLSDIR/outputs"
@@ -264,7 +258,7 @@ SIGNED_JSONFILE
   if [ "${PKG_RESULT}" != "0" ]; then
     echo "Could not sign package: ${PKG_RESULT}" 1>&2
   else
-    if [ -n "$6" ]; then
+    if [ -n "$5" ]; then
       # Notarize and staple the package
       $XCODE_NOTARY_PATH store-credentials --apple-id "macadmins@cleverdevops.com" --team-id "9GQZ7KUFR6" --password "$NOTARY_PASS" macadminpython
       # If these fail, it will bail on the entire process
