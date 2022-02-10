@@ -215,24 +215,6 @@ fi
 # Create outputs folder
 /bin/mkdir -p "$TOOLSDIR/outputs"
 
-# Create the json file for munki-pkg
-/bin/cat << JSONFILE > "$TOOLSDIR/$TYPE/build-info.json"
-{
-  "ownership": "recommended",
-  "suppress_bundle_relocation": true,
-  "identifier": "org.macadmins.python.$TYPE",
-  "postinstall_action": "none",
-  "distribution_style": true,
-  "version": "$AUTOMATED_PYTHON_BUILD",
-  "name": "python_$TYPE-$AUTOMATED_PYTHON_BUILD.pkg",
-  "install_location": "/"
-}
-JSONFILE
-# Create the unsigned pkg
-"${MP_BINDIR}/munki-pkg-${MP_SHA}/munkipkg" "$TOOLSDIR/$TYPE"
-# Move the unsigned pkg
-/bin/mv "$TOOLSDIR/$TYPE/build/python_$TYPE-$AUTOMATED_PYTHON_BUILD.pkg" "$OUTPUTSDIR"
-
 if [ -n "$2" ]; then
   # Create the json file for munki-pkg (signed)
   /bin/cat << SIGNED_JSONFILE > "$TOOLSDIR/$TYPE/build-info.json"
