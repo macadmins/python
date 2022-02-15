@@ -3,7 +3,11 @@ A Python 3 framework that currently installs to `/Library/ManagedFrameworks/Pyth
 
 Please see Apple's documentation on [file system basics](https://developer.apple.com/library/archive/documentation/FileManagement/Conceptual/FileSystemProgrammingGuide/FileSystemOverview/FileSystemOverview.html) for more information on the thought process here.
 
-This is an intended replacement for when Apple removes `/usr/bin/python`
+This is an intended replacement for when Apple removes `/usr/bin/python` (which is happening with the macOS 12.3 release Spring 2022)
+
+## Why should I use this instead of a package from python.org?
+- It comes with PyObjC and other modules useful for MacAdmisns pre-installed; making it more like the Apple Python it's intended to replace
+- It installs to a location less likely to be overwritten, removed, or modified by developers or power users who are also working with Python
 
 ## Using interactively
 After installing any of the packages, a symbolic link can be used within terminal for interactive Python sessions. At the time of this writing `/usr/local/bin/managed_python3` points to `/Library/ManagedFrameworks/Python/Python3.framework/Versions/Current/bin/python3`
