@@ -8,6 +8,7 @@ env:
   PYTHON_VERSION: "3.9.16"
 
 on:
+  workflow_dispatch:
   pull_request:
   push:
     branches:
