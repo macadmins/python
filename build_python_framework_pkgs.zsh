@@ -133,7 +133,7 @@ fi
 
 # Force the C path depending on the version of Python to allow tools like cffi/xattr to build without wheels otherwise it errors
 # Can't use Apple's headers for 3.10 and higher as they are (currently) 3.9
-export C_INCLUDE_PATH="/Library/Frameworks/Python.framework/Versions/${PYTHON_BIN_VERSION}/include/python${PYTHON_BIN_VERSION}/"
+export C_INCLUDE_PATH="/Library/ManagedFrameworks/Python.framework/Versions/${PYTHON_BIN_VERSION}/include/python${PYTHON_BIN_VERSION}/"
 # export C_INCLUDE_PATH="/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/Current/Headers/"
 
 # build the framework
