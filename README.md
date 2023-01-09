@@ -3,7 +3,11 @@ A Python 3 framework that currently installs to `/Library/ManagedFrameworks/Pyth
 
 Please see Apple's documentation on [file system basics](https://developer.apple.com/library/archive/documentation/FileManagement/Conceptual/FileSystemProgrammingGuide/FileSystemOverview/FileSystemOverview.html) for more information on the thought process here.
 
-This is an intended replacement for when Apple removes `/usr/bin/python`
+This is an intended replacement for when Apple removes `/usr/bin/python` (which is happening with the macOS 12.3 release Spring 2022)
+
+## Why should I use this instead of a package from python.org?
+- It comes with PyObjC and other modules useful for Mac admins pre-installed; making it more like the Apple Python it's intended to replace
+- It installs to a location less likely to be overwritten, removed, or modified by developers or power users who are also working with Python
 
 ## Using interactively
 After installing any of the packages, a symbolic link can be used within terminal for interactive Python sessions. At the time of this writing `/usr/local/bin/managed_python3` points to `/Library/ManagedFrameworks/Python/Python3.framework/Versions/Current/bin/python3`
@@ -41,7 +45,7 @@ Downgrades will not be supported by this repository.
 ### pip
 While `pip` is bundled in this framework, it is **not recommended** to install any external libraries into your frameworks folder outside of what comes with the package. If you need to use or test external libraries not present in the package, it is recommended to use a [virtual environment](https://docs.python.org/3/library/venv.html) or a tool like [pyenv](https://github.com/pyenv/pyenv).
 
-Pull requests can be issued to the `opinionated` or `recommended` packages, but more scrutiny will be applied to the `recommended` package.
+Pull requests can and are encouraged to be issued to the `recommended` packages requirements file.
 
 # Flavors of Python
 We currently offer four versions of Python. You can chose which version suits your needs.
@@ -70,16 +74,6 @@ Tools that should work when using the "Recommended Flavor":
 - [munki-facts](https://github.com/munki/munki-facts) (python 3 pull request [here](https://github.com/munki/munki-facts/pull/17))
 - [Nudge](https://github.com/macadmins/nudge)
 - [UMAD](https://github.com/macadmins/umad)
-
-## Opinionated
-This is a Python.framework that contains everything from "Recommended", and libraries that various open source projects require.
-
-This is a **kitchen sink** approach, opting for the latest known packages.
-
-Tools that should work when using the "Opinionated Flavor":
-- [Gusto's AutoPkg promotion tool](https://github.com/Gusto/it-cpe-opensource/tree/master/autopromote)
-- [Munki CloudFront Middleware](https://github.com/AaronBurchfield/CloudFront-Middleware)
-- [Python-jss](https://github.com/jssimporter/python-jss)
 
 # Updating packages
 This should be done in a clean virtual environment. After every Python package install, you can run `pip freeze | xargs pip uninstall -y` to cleanup the environment.
