@@ -1,4 +1,4 @@
-name: Build and upload recommended package
+name: Build Python 3.9
 
 env:
   TYPE: "recommended"
