@@ -5,7 +5,7 @@ env:
   DEV_INSTALLER_ID: "Developer ID Installer: Clever DevOps Co. (9GQZ7KUFR6)"
   DEV_APPLICATION_ID: "Developer ID Application: Clever DevOps Co. (9GQZ7KUFR6)"
   NOTARY_PASS: ${{ secrets.NOTARY_PASS }}
-  PYTHON_VERSION: "3.9.16"
+  PYTHON_VERSION: "3.9.13"
 
 on:
   workflow_dispatch:
@@ -65,10 +65,13 @@ jobs:
             Python ${{env.PYTHON_VERSION}} Framework
 
             ## Changes
-            - Upgraded Python to 3.9.16
+            - Upgraded Python to 3.9.13
             **Note: Some of these updates may have breaking changes. Always test your code before deploying to production!**
             
             Please see the `requirements_recommended.txt` for the current libraries being used.
+
+            ## Security Notice
+            The official Python FTP does not currently provide macOS packages for Python 3.9.14 and higher. This means that this project cannot use the most recent version of Python 3.9 with all security updates. Proceed with caution when using this release.
             
             ${{ steps.changelog.outputs.changelog }}
 
