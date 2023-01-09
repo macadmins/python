@@ -131,8 +131,8 @@ else
   /usr/bin/sudo /usr/sbin/chown -R ${CONSOLEUSER}:wheel "$TOOLSDIR/$TYPE"
 fi
 
-# Force the C Path depending on the version of Python to allow tools like cffi/xattr to build without wheels
-export C_INCLUDE_PATH="/Library/Frameworks/Python.framework/Versions/${PYTHON_BIN_VERSION}/include/python${PYTHON_BIN_VERSION}"
+# Force the C path to allow tools like cffi/xattr to build without wheels
+export C_INCLUDE_PATH="/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/Current/Headers/"
 
 # build the framework
 RP_EXTRACT_BINDIR="${RP_BINDIR}/relocatable-python-${RP_SHA}"
