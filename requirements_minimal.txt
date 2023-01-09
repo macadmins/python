@@ -1,2 +1,7 @@
-pycparser=2.21
 cffi==1.15.1
+--no-binary cffi
+pycparser==2.21
+pyobjc==9.0.1
+six==1.16.0
+xattr==0.10.1
+--no-binary xattr
