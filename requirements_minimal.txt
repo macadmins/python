@@ -1,4 +1,3 @@
---no-binary :all:
 cffi==1.15.1
 pycparser==2.21
 pyobjc==9.0.1
