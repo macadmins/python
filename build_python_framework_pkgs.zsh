@@ -144,6 +144,12 @@ fi
 echo "Moving Python.framework to payload folder"
 /bin/mv "${FRAMEWORKDIR}/Python.framework" "$TOOLSDIR/$TYPE/payload${FRAMEWORKDIR}/Python3.framework"
 
+RP_RESULT2="$?"
+if [ "${RP_RESULT2}" != "0" ]; then
+    echo "Failed to move Python framework, likely due to a bug with relocatable python" 1>&2
+    exit 1
+fi
+
 # re-sign the framework so it will run on Apple Silicon
 if [ -n "$3" ]; then
   echo "Adding developer id code signing so the framework will run on Apple Silicon..."
