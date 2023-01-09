@@ -51,7 +51,7 @@ While `pip` is bundled in this framework, it is **not recommended** to install a
 Pull requests can and are encouraged to be issued to the `recommended` packages requirements file.
 
 # Flavors of Python
-We currently offer four versions of Python. You can chose which version suits your needs.
+We currently offer three versions of Python. You can chose which version suits your needs, however only the `recommended` package is built/signed/notarized.
 
 ## No Customization
 This is a Python.framework that contains everything from the official Python package and nothing more.

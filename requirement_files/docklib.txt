@@ -1,1 +1,1 @@
-docklib==1.2.0
+docklib==1.3.0

@@ -1,1 +1,1 @@
-entrypoints==0.3
+entrypoints==0.4
