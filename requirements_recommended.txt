@@ -4,7 +4,7 @@ asn1crypto==1.4.0
 attrs==21.4.0
 black==22.1.0
 certifi==2022.12.7
-cffi==1.15.0
+cffi==1.15.1
 cfgv==3.3.1
 chardet==4.0.0
 click==8.0.3
@@ -26,7 +26,7 @@ pre-commit==2.17.0
 pycodestyle==2.8.0
 pycparser==2.21
 pyflakes==2.4.0
-pyobjc==8.2
+pyobjc==9.0.1
 pyparsing==3.0.7
 PyYAML==6.0
 regex==2022.1.18
@@ -37,5 +37,5 @@ toml==0.10.2
 typed-ast==1.5.2
 urllib3==1.26.8
 virtualenv==20.13.0
-xattr==0.9.9
+xattr==0.10.1
 zipp==3.7.0

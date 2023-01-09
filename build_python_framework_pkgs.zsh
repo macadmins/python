@@ -6,7 +6,7 @@
 # Run this with your current directory being the path where this script is located
 
 # Harcoded versions
-RP_SHA="06b3052afe49c400aa4196f2aada15c0992e3725"
+RP_SHA="fb4dd9b024b249c71713f14d887f4bcea78aa8b0"
 MP_SHA="0fcd47faf0fb2b4e8a0256a77be315a3cb6ab319"
 MACOS_VERSION=11 # use 10.9 for non-universal
 PYTHON_PRERELEASE_VERSION=
@@ -18,7 +18,7 @@ RP_BINDIR="/tmp/relocatable-python"
 MP_BINDIR="/tmp/munki-pkg"
 CONSOLEUSER=$(/usr/bin/stat -f "%Su" /dev/console)
 PIPCACHEDIR="/Users/${CONSOLEUSER}/Library/Caches/pip"
-XCODE_PATH="/Applications/Xcode_13.2.1.app"
+XCODE_PATH="/Applications/Xcode_14.1.app"
 XCODE_NOTARY_PATH="$XCODE_PATH/Contents/Developer/usr/bin/notarytool"
 XCODE_STAPLER_PATH="$XCODE_PATH/Contents/Developer/usr/bin/stapler"
 NEWSUBBUILD=$((80620 + $(git rev-parse HEAD~0 | xargs -I{} git rev-list --count {})))
@@ -55,7 +55,7 @@ fi
 if [ -n "$4" ]; then
   PYTHON_VERSION=$4
 else
-  PYTHON_VERSION=3.10.2
+  PYTHON_VERSION=3.11.1
 fi
 # Set python bin version based on PYTHON_VERSION
 PYTHON_BIN_VERSION="${PYTHON_VERSION%.*}"

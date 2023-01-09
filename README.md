@@ -5,6 +5,9 @@ Please see Apple's documentation on [file system basics](https://developer.apple
 
 This is an intended replacement for when Apple removes `/usr/bin/python` (which is happening with the macOS 12.3 release Spring 2022)
 
+## Build Issues
+At this time, it is required to build this version of python on an Intel macOS device.
+
 ## Why should I use this instead of a package from python.org?
 - It comes with PyObjC and other modules useful for Mac admins pre-installed; making it more like the Apple Python it's intended to replace
 - It installs to a location less likely to be overwritten, removed, or modified by developers or power users who are also working with Python

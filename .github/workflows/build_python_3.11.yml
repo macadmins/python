@@ -1,0 +1,93 @@
+name: Build and upload recommended package
+
+env:
+  TYPE: "recommended"
+  DEV_INSTALLER_ID: "Developer ID Installer: Clever DevOps Co. (9GQZ7KUFR6)"
+  DEV_APPLICATION_ID: "Developer ID Application: Clever DevOps Co. (9GQZ7KUFR6)"
+  NOTARY_PASS: ${{ secrets.NOTARY_PASS }}
+  PYTHON_VERSION: "3.11.1"
+
+on:
+  pull_request:
+  push:
+    branches:
+    - main
+    paths-ignore:
+    - '**/README.md'
+
+jobs:
+  build:
+    runs-on: macos-12
+
+    steps:
+    - name: Checkout python repo
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 0
+
+    - name: Install Apple Developer ID Application certificates
+      uses: ssrobins/import-codesign-certs@04ce695a5e6002f1971a8ed78fedd676318f950f # Move back to apple-actions/import-codesign-certs when merged
+      with:
+        keychain-password: ${{ secrets.KEYCHAIN_PASSWORD }}
+        p12-file-base64: ${{ secrets.DEV_APP_CERTIFICATES_P12 }}
+        p12-password: ${{ secrets.DEV_APP_CERTIFICATES_P12_PASSWORD }}
+
+    - name: Install Apple Developer ID Installer certificates
+      uses: ssrobins/import-codesign-certs@04ce695a5e6002f1971a8ed78fedd676318f950f # Move back to apple-actions/import-codesign-certs when merged
+      with:
+        create-keychain: false # do not create a new keychain for this value
+        keychain-password: ${{ secrets.KEYCHAIN_PASSWORD }}
+        p12-file-base64: ${{ secrets.CERTIFICATES_P12 }}
+        p12-password: ${{ secrets.CERTIFICATES_P12_PASSWORD }}
+
+    - name: Run build package script
+      run: ./build_python_framework_pkgs.zsh "$TYPE" "$DEV_INSTALLER_ID" "$DEV_APPLICATION_ID" "$PYTHON_VERSION" "${NOTARY_PASS}"
+
+    - name: get environment variables
+      id: get_env_var
+      run: |
+         echo "PYTHON_BUILD_VERSION=$(/bin/cat ./build_info.txt)" >> $GITHUB_ENV
+
+    - name: Generate changelog
+      id: changelog
+      uses: metcalfc/changelog-generator@31b6d6f9e6e17e84ad34bee780f82d8ee79f6842 # v4.0.1
+      with:
+        myToken: ${{ secrets.GITHUB_TOKEN }}
+        reverse: 'true'
+
+    - name: Create Release
+      id: create_release
+      uses: softprops/action-gh-release@de2c0eb89ae2a093876385947365aca7b0e5f844 # v0.1.15
+      with:
+        name: Python ${{env.PYTHON_BUILD_VERSION}}
+        tag_name: v${{env.PYTHON_BUILD_VERSION}}
+        draft: false
+        prerelease: true
+        token: ${{ secrets.GITHUB_TOKEN }}
+        body: |
+            # Notes
+            Python ${{env.PYTHON_VERSION}} Framework
+
+            ## Changes
+            - Upgraded Python to 3.11.1
+            **Note: Some of these updates may have breaking changes. Always test your code before deploying to production!**
+            
+            Please see the `requirements_recommended.txt` for the current libraries being used.
+            
+            ${{ steps.changelog.outputs.changelog }}
+
+            # Flavors of Python
+            At this time, the automated build process will **only** create the Recommended package
+
+            ## Recommended
+            This is a Python.framework that contains everything from minimal, and a few libraries that various well known open source projects require.
+
+            ## Signing/Notarization
+            The signed package is fully notarized, including the Python.framework file
+        files: ${{github.workspace}}/outputs/*.pkg
+
+    - name: Upload packages
+      uses: actions/upload-artifact@v3.1.1
+      with:
+        name: packages
+        path: outputs/
