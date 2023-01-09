@@ -92,6 +92,17 @@ fi
 # kill homebrew packages
 /usr/local/bin/brew remove --force $(/usr/local/bin/brew list)
 
+# Ensure Xcode is set to run-time
+sudo xcode-select -s "$XCODE_PATH"
+
+if [ -e $XCODE_BUILD_PATH ]; then
+  XCODE_BUILD="$XCODE_BUILD_PATH"
+else
+  ls -la /Applications
+  echo "Could not find required Xcode build. Exiting..."
+  exit 1
+fi
+
 # Download specific version of relocatable-python
 echo "Downloading relocatable-python tool from github..."
 if [ -f "${RP_ZIP}" ]; then
