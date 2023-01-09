@@ -21,7 +21,7 @@ PIPCACHEDIR="/Users/${CONSOLEUSER}/Library/Caches/pip"
 XCODE_PATH="/Applications/Xcode_14.1.app"
 XCODE_NOTARY_PATH="$XCODE_PATH/Contents/Developer/usr/bin/notarytool"
 XCODE_STAPLER_PATH="$XCODE_PATH/Contents/Developer/usr/bin/stapler"
-NEWSUBBUILD=$((80620 + $(git rev-parse HEAD~0 | xargs -I{} git rev-list --count {})))
+NEWSUBBUILD=$((80620 + $(/usr/bin/git rev-parse HEAD~0 | xargs -I{} /usr/bin/git rev-list --count {})))
 
 # Sanity Checks
 ## Type Check
