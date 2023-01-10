@@ -131,13 +131,12 @@ else
   /usr/bin/sudo /usr/sbin/chown -R ${CONSOLEUSER}:wheel "$TOOLSDIR/$TYPE"
 fi
 
+# build the framework
 # Force the C path depending on the version of Python to allow tools like cffi/xattr to build without wheels otherwise it errors
 # Can't use Apple's headers for 3.10 and higher as they are (currently) 3.9
-export C_INCLUDE_PATH="/Library/ManagedFrameworks/Python.framework/Versions/${PYTHON_BIN_VERSION}/include/python${PYTHON_BIN_VERSION}/"
-# export C_INCLUDE_PATH="/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/Current/Headers/"
+# C_INCLUDE_PATH="/Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/Current/Headers/"
 
-# build the framework
-RP_EXTRACT_BINDIR="${RP_BINDIR}/relocatable-python-${RP_SHA}"
+C_INCLUDE_PATH="/Library/ManagedFrameworks/Python/Python.framework/Versions/${PYTHON_BIN_VERSION}/include/python${PYTHON_BIN_VERSION}/" RP_EXTRACT_BINDIR="${RP_BINDIR}/relocatable-python-${RP_SHA}"
 "${RP_EXTRACT_BINDIR}/make_relocatable_python_framework.py" \
 --baseurl "${PYTHON_BASEURL}" \
 --python-version "${PYTHON_VERSION}" \
