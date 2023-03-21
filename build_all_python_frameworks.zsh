@@ -6,7 +6,7 @@
 # Run this with your current directory being the path where this script is located
 
 TOOLSDIR=$(dirname $0)
-SIGNING_IDENTITY="Developer ID Installer: Clever DevOps Co. (9GQZ7KUFR6)"
+SIGNING_IDENTITY="Developer ID Installer: Mac Admins Open Source (T4SK8ZXCXG)"
 
 "$TOOLSDIR/build_python_framework_pkgs.zsh" minimal ${SIGNING_IDENTITY}
 "$TOOLSDIR/build_python_framework_pkgs.zsh" no_customization ${SIGNING_IDENTITY}
