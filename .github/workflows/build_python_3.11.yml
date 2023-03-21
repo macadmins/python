@@ -25,8 +25,8 @@ jobs:
       uses: apple-actions/import-codesign-certs@8f3fb608891dd2244cdab3d69cd68c0d37a7fe93 # v2.0.0
       with:
         keychain-password: ${{ github.run_id }}
-        p12-file-base64: ${{ secrets.APP_CERTIFICATES_P12_PASSWORD_MAOS }}
-        p12-password: ${{ secrets.APP_CERTIFICATES_P12_PASSWORD_MAOS_PASSWORD }}
+        p12-file-base64: ${{ secrets.APP_CERTIFICATES_P12_MAOS }}
+        p12-password: ${{ secrets.APP_CERTIFICATES_P12_PASSWORD_MAOS }}
 
     - name: Install Apple Developer ID Installer certificates
       uses: apple-actions/import-codesign-certs@8f3fb608891dd2244cdab3d69cd68c0d37a7fe93 # v2.0.0
@@ -34,7 +34,7 @@ jobs:
         create-keychain: false # do not create a new keychain for this value
         keychain-password: ${{ github.run_id }}
         p12-file-base64: ${{ secrets.PKG_CERTIFICATES_P12_MAOS }}
-        p12-password: ${{ secrets.PKG_CERTIFICATES_P12_MAOS_PASSWORD }}
+        p12-password: ${{ secrets.PKG_CERTIFICATES_P12_PASSWORD_MAOS }}
 
     - name: Run build package script
       run: ./build_python_framework_pkgs.zsh "$TYPE" "$DEV_INSTALLER_ID" "$DEV_APPLICATION_ID" "$PYTHON_VERSION" "${NOTARY_PASS}"
