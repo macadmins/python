@@ -30,7 +30,7 @@ pyflakes==3.0.1
 pyobjc==9.0.1
 PyYAML==6.0
 --no-binary PyYAML
-requests==2.28.1
+requests==2.31.0
 six==1.16.0
 tokenize-rt==5.0.0
 tomli==2.0.1
