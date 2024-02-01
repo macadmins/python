@@ -8,6 +8,7 @@ cffi==1.16.0
 --no-binary cffi
 cfgv==3.4.0
 charset-normalizer==3.3.2
+--no-binary charset-normalizer
 click==8.1.7
 distlib==0.3.8
 docklib==1.3.0
