@@ -5,7 +5,7 @@ env:
   DEV_INSTALLER_ID: "Developer ID Installer: Mac Admins Open Source (T4SK8ZXCXG)"
   DEV_APPLICATION_ID: "Developer ID Application: Mac Admins Open Source (T4SK8ZXCXG)"
   NOTARY_PASS: ${{ secrets.NOTARY_PASS }}
-  PYTHON_VERSION: "3.11.1"
+  PYTHON_VERSION: "3.11.7"
 
 on:
   workflow_dispatch:
@@ -13,7 +13,7 @@ on:
 
 jobs:
   build:
-    runs-on: macos-12
+    runs-on: macos-13
 
     steps:
     - name: Checkout python repo
@@ -65,7 +65,7 @@ jobs:
             Python ${{env.PYTHON_VERSION}} Framework
 
             ## Changes
-            - Upgraded Python to 3.11.1
+            - Upgraded Python to 3.11.7
             **Note: Some of these updates may have breaking changes. Always test your code before deploying to production!**
             
             Please see the `requirements_recommended.txt` for the current libraries being used.
