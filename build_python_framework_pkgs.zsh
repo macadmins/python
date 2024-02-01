@@ -22,6 +22,7 @@ XCODE_PATH="/Applications/Xcode_15.2.app"
 XCODE_NOTARY_PATH="$XCODE_PATH/Contents/Developer/usr/bin/notarytool"
 XCODE_STAPLER_PATH="$XCODE_PATH/Contents/Developer/usr/bin/stapler"
 NEWSUBBUILD=$((80620 + $(/usr/bin/git rev-parse HEAD~0 | xargs -I{} /usr/bin/git rev-list --count {})))
+TOOLSDIR=$(dirname $0)
 
 # Sanity Checks
 ## Type Check
@@ -55,7 +56,6 @@ fi
 if [ -n "$4" ]; then
   PYTHON_VERSION=$4
 else
-  PYTHON_VERSION=3.11.1
   PYTHON_VERSION=3.12.1
 fi
 
@@ -221,7 +221,18 @@ echo "Shared objects are confirmed as universal"
 /usr/sbin/spctl -a -vvvv "$TOOLSDIR/$TYPE/payload${FRAMEWORKDIR}/Python3.framework/Versions/${PYTHON_BIN_VERSION}/lib/libssl.1.1.dylib"
 
 # make a symbolic link to help with interactive use
-/bin/ln -s "$PYTHON_BIN" "$TOOLSDIR/$TYPE/payload/usr/local/bin/managed_python3"
+if [ "${PYTHON_MAJOR_VERSION}" == "3.9" ]; then
+  /bin/ln -s "$PYTHON_BIN" "$TOOLSDIR/$TYPE/payload/usr/local/bin/managed_python3"
+fi
+if [ "${PYTHON_MAJOR_VERSION}" == "3.10" ]; then
+  /bin/ln -s "$PYTHON_BIN" "$TOOLSDIR/$TYPE/payload/usr/local/bin/managed_python3"
+fi
+if [ "${PYTHON_MAJOR_VERSION}" == "3.11" ]; then
+  /bin/cp "$TOOLSDIR/python-$PYTHON_MAJOR_VERSION}" "$TOOLSDIR/$TYPE/payload/usr/local/bin/managed_python3"
+fi
+if [ "${PYTHON_MAJOR_VERSION}" == "3.12" ]; then
+  /bin/cp "$PYTHON_BIN" "$TOOLSDIR/$TYPE/payload/usr/local/bin/managed_python3"
+fi
 
 # take ownership of the payload folder
 echo "Taking ownership of the Payload directory"
