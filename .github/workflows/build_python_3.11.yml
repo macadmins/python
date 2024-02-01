@@ -6,6 +6,7 @@ env:
   DEV_APPLICATION_ID: "Developer ID Application: Mac Admins Open Source (T4SK8ZXCXG)"
   NOTARY_PASS: ${{ secrets.NOTARY_PASS }}
   PYTHON_VERSION: "3.11.7"
+  PYTHON_MAJOR_VERSION: "3.11"
 
 on:
   workflow_dispatch:

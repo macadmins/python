@@ -18,7 +18,7 @@ RP_BINDIR="/tmp/relocatable-python"
 MP_BINDIR="/tmp/munki-pkg"
 CONSOLEUSER=$(/usr/bin/stat -f "%Su" /dev/console)
 PIPCACHEDIR="/Users/${CONSOLEUSER}/Library/Caches/pip"
-XCODE_PATH="/Applications/Xcode_14.1.app"
+XCODE_PATH="/Applications/Xcode_15.2.app"
 XCODE_NOTARY_PATH="$XCODE_PATH/Contents/Developer/usr/bin/notarytool"
 XCODE_STAPLER_PATH="$XCODE_PATH/Contents/Developer/usr/bin/stapler"
 NEWSUBBUILD=$((80620 + $(/usr/bin/git rev-parse HEAD~0 | xargs -I{} /usr/bin/git rev-list --count {})))
@@ -56,6 +56,13 @@ if [ -n "$4" ]; then
   PYTHON_VERSION=$4
 else
   PYTHON_VERSION=3.11.1
+  PYTHON_VERSION=3.12.1
+fi
+
+if [ -n "$5" ]; then
+  PYTHON_MAJOR_VERSION=$5
+else
+  PYTHON_MAJOR_VERSION=3.12
 fi
 # Set python bin version based on PYTHON_VERSION
 PYTHON_BIN_VERSION="${PYTHON_VERSION%.*}"
