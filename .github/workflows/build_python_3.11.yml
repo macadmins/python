@@ -4,7 +4,7 @@ env:
   TYPE: "recommended"
   DEV_INSTALLER_ID: "Developer ID Installer: Mac Admins Open Source (T4SK8ZXCXG)"
   DEV_APPLICATION_ID: "Developer ID Application: Mac Admins Open Source (T4SK8ZXCXG)"
-  NOTARY_PASS: ${{ secrets.NOTARY_PASS }}
+  NOTARY_APP_PASSWORD: ${{ secrets.NOTARY_APP_PASSWORD_MAOS }}
   PYTHON_VERSION: "3.11.7"
   PYTHON_MAJOR_VERSION: "3.11"
 
@@ -38,7 +38,7 @@ jobs:
         p12-password: ${{ secrets.PKG_CERTIFICATES_P12_PASSWORD_MAOS }}
 
     - name: Run build package script
-      run: ./build_python_framework_pkgs.zsh "$TYPE" "$DEV_INSTALLER_ID" "$DEV_APPLICATION_ID" "$PYTHON_VERSION" "${NOTARY_PASS}"
+      run: ./build_python_framework_pkgs.zsh "$TYPE" "$DEV_INSTALLER_ID" "$DEV_APPLICATION_ID" "$PYTHON_VERSION" "${NOTARY_APP_PASSWORD}"
 
     - name: get environment variables
       id: get_env_var
