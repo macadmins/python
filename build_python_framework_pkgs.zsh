@@ -160,6 +160,26 @@ if [ "${RP_RESULT}" != "0" ]; then
     exit 1
 fi
 
+# make a symbolic link to help with interactive use
+if [[ "${PYTHON_MAJOR_VERSION}" == "3.9" ]]; then
+  /bin/ln -s "$PYTHON_BIN" "$TOOLSDIR/$TYPE/payload/usr/local/bin/managed_python3"
+fi
+if [[ "${PYTHON_MAJOR_VERSION}" == "3.10" ]]; then
+  /bin/ln -s "$PYTHON_BIN" "$TOOLSDIR/$TYPE/payload/usr/local/bin/managed_python3"
+fi
+if [[ "${PYTHON_MAJOR_VERSION}" == "3.11" ]]; then
+  /bin/cp "$TOOLSDIR/python-$PYTHON_MAJOR_VERSION}" "$TOOLSDIR/$TYPE/payload/usr/local/bin/managed_python3"
+fi
+if [[ "${PYTHON_MAJOR_VERSION}" == "3.12" ]]; then
+  /bin/cp "$PYTHON_BIN" "$TOOLSDIR/$TYPE/payload/usr/local/bin/managed_python3"
+fi
+
+SB_RESULT="$?"
+if [ "${SB_RESULT}" != "0" ]; then
+    echo "Failed create managed_python3 object" 1>&2
+    exit 1
+fi
+
 # move the framework to the Python package folder
 echo "Moving Python.framework to payload folder"
 /bin/mv "${FRAMEWORKDIR}/Python.framework" "$TOOLSDIR/$TYPE/payload${FRAMEWORKDIR}/Python3.framework"
@@ -218,20 +238,6 @@ fi
 # Print out some information about the signatures
 /usr/sbin/spctl -a -vvvv "$TOOLSDIR/$TYPE/payload${FRAMEWORKDIR}/Python3.framework/Versions/${PYTHON_BIN_VERSION}/Python"
 /usr/sbin/spctl -a -vvvv "$TOOLSDIR/$TYPE/payload${FRAMEWORKDIR}/Python3.framework/Versions/${PYTHON_BIN_VERSION}/lib/libssl.1.1.dylib"
-
-# make a symbolic link to help with interactive use
-if [ "${PYTHON_MAJOR_VERSION}" == "3.9" ]; then
-  /bin/ln -s "$PYTHON_BIN" "$TOOLSDIR/$TYPE/payload/usr/local/bin/managed_python3"
-fi
-if [ "${PYTHON_MAJOR_VERSION}" == "3.10" ]; then
-  /bin/ln -s "$PYTHON_BIN" "$TOOLSDIR/$TYPE/payload/usr/local/bin/managed_python3"
-fi
-if [ "${PYTHON_MAJOR_VERSION}" == "3.11" ]; then
-  /bin/cp "$TOOLSDIR/python-$PYTHON_MAJOR_VERSION}" "$TOOLSDIR/$TYPE/payload/usr/local/bin/managed_python3"
-fi
-if [ "${PYTHON_MAJOR_VERSION}" == "3.12" ]; then
-  /bin/cp "$PYTHON_BIN" "$TOOLSDIR/$TYPE/payload/usr/local/bin/managed_python3"
-fi
 
 # take ownership of the payload folder
 echo "Taking ownership of the Payload directory"
