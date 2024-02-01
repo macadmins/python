@@ -171,25 +171,6 @@ if [ "${RP_RESULT2}" != "0" ]; then
     exit 1
 fi
 
-# re-sign the framework so it will run on Apple Silicon
-if [ -n "$3" ]; then
-  echo "Adding developer id code signing so the framework will run on Apple Silicon..."
-  /usr/bin/find "$TOOLSDIR/$TYPE/payload${FRAMEWORKDIR}/Python3.framework/Versions/${PYTHON_BIN_VERSION}/bin" -type f -perm -u=x -exec /usr/bin/codesign --sign "$3" --timestamp --preserve-metadata=identifier,entitlements,flags,runtime -f {} \;
-  /usr/bin/find "$TOOLSDIR/$TYPE/payload${FRAMEWORKDIR}/Python3.framework/Versions/${PYTHON_BIN_VERSION}/lib" -type f -perm -u=x -exec /usr/bin/codesign --sign "$3" --timestamp --preserve-metadata=identifier,entitlements,flags,runtime -f {} \;
-  /usr/bin/find "$TOOLSDIR/$TYPE/payload${FRAMEWORKDIR}/Python3.framework/Versions/${PYTHON_BIN_VERSION}/lib" -type f -name "*dylib" -exec /usr/bin/codesign --sign "$3" --timestamp --preserve-metadata=identifier,entitlements,flags,runtime -f {} \;
-  /usr/bin/codesign --sign "$3" --timestamp --deep --force --preserve-metadata=identifier,entitlements,flags,runtime "$TOOLSDIR/$TYPE/payload${FRAMEWORKDIR}/Python3.framework/Versions/${PYTHON_BIN_VERSION}/Resources/Python.app"
-  /usr/bin/codesign --sign "$3" --timestamp --force --preserve-metadata=identifier,entitlements,flags,runtime "$TOOLSDIR/$TYPE/payload${FRAMEWORKDIR}/Python3.framework/Versions/${PYTHON_BIN_VERSION}/Python"
-  /usr/bin/codesign --sign "$3" --timestamp --force --preserve-metadata=identifier,entitlements,flags,runtime "$TOOLSDIR/$TYPE/payload${FRAMEWORKDIR}/Python3.framework/Versions/Current/Python"
-else
-  echo "Adding ad-hoc code signing so the framework will run on Apple Silicon..."
-  /usr/bin/find "$TOOLSDIR/$TYPE/payload${FRAMEWORKDIR}/Python3.framework/Versions/${PYTHON_BIN_VERSION}/bin" -type f -perm -u=x -exec /usr/bin/codesign -s - --preserve-metadata=identifier,entitlements,flags,runtime -f {} \;
-  /usr/bin/find "$TOOLSDIR/$TYPE/payload${FRAMEWORKDIR}/Python3.framework/Versions/${PYTHON_BIN_VERSION}/lib" -type f -perm -u=x -exec /usr/bin/codesign -s - --preserve-metadata=identifier,entitlements,flags,runtime -f {} \;
-  /usr/bin/find "$TOOLSDIR/$TYPE/payload${FRAMEWORKDIR}/Python3.framework/Versions/${PYTHON_BIN_VERSION}/lib" -type f -name "*dylib" -exec /usr/bin/codesign -s - --preserve-metadata=identifier,entitlements,flags,runtime -f {} \;
-  /usr/bin/codesign -s - --deep --force --preserve-metadata=identifier,entitlements,flags,runtime "$TOOLSDIR/$TYPE/payload${FRAMEWORKDIR}/Python3.framework/Versions/${PYTHON_BIN_VERSION}/Resources/Python.app"
-  /usr/bin/codesign -s - --force --preserve-metadata=identifier,entitlements,flags,runtime "$TOOLSDIR/$TYPE/payload${FRAMEWORKDIR}/Python3.framework/Versions/${PYTHON_BIN_VERSION}/Python"
-  /usr/bin/codesign -s - --force --preserve-metadata=identifier,entitlements,flags,runtime "$TOOLSDIR/$TYPE/payload${FRAMEWORKDIR}Python3.framework/Versions/Current/Python"
-fi
-
 # confirm truly universal
 TOTAL_DYLIB=$(/usr/bin/find "$TOOLSDIR/$TYPE/payload${FRAMEWORKDIR}/Python3.framework/Versions/${PYTHON_BIN_VERSION}/lib" -name "*.dylib" | /usr/bin/wc -l | /usr/bin/xargs)
 UNIVERSAL_DYLIB=$(/usr/bin/find "$TOOLSDIR/$TYPE/payload${FRAMEWORKDIR}/Python3.framework/Versions/${PYTHON_BIN_VERSION}/lib" -name "*.dylib" | /usr/bin/xargs file | /usr/bin/grep "2 architectures" | /usr/bin/wc -l | /usr/bin/xargs)
@@ -215,6 +196,25 @@ if [ "${TOTAL_SO}" != "${UNIVERSAL_SO}" ] ; then
 fi
 
 echo "Shared objects are confirmed as universal"
+
+# re-sign the framework so it will run on Apple Silicon
+if [ -n "$3" ]; then
+  echo "Adding developer id code signing so the framework will run on Apple Silicon..."
+  /usr/bin/find "$TOOLSDIR/$TYPE/payload${FRAMEWORKDIR}/Python3.framework/Versions/${PYTHON_BIN_VERSION}/bin" -type f -perm -u=x -exec /usr/bin/codesign --sign "$3" --timestamp --preserve-metadata=identifier,entitlements,flags,runtime -f {} \;
+  /usr/bin/find "$TOOLSDIR/$TYPE/payload${FRAMEWORKDIR}/Python3.framework/Versions/${PYTHON_BIN_VERSION}/lib" -type f -perm -u=x -exec /usr/bin/codesign --sign "$3" --timestamp --preserve-metadata=identifier,entitlements,flags,runtime -f {} \;
+  /usr/bin/find "$TOOLSDIR/$TYPE/payload${FRAMEWORKDIR}/Python3.framework/Versions/${PYTHON_BIN_VERSION}/lib" -type f -name "*dylib" -exec /usr/bin/codesign --sign "$3" --timestamp --preserve-metadata=identifier,entitlements,flags,runtime -f {} \;
+  /usr/bin/codesign --sign "$3" --timestamp --deep --force --preserve-metadata=identifier,entitlements,flags,runtime "$TOOLSDIR/$TYPE/payload${FRAMEWORKDIR}/Python3.framework/Versions/${PYTHON_BIN_VERSION}/Resources/Python.app"
+  /usr/bin/codesign --sign "$3" --timestamp --force --preserve-metadata=identifier,entitlements,flags,runtime "$TOOLSDIR/$TYPE/payload${FRAMEWORKDIR}/Python3.framework/Versions/${PYTHON_BIN_VERSION}/Python"
+  /usr/bin/codesign --sign "$3" --timestamp --force --preserve-metadata=identifier,entitlements,flags,runtime "$TOOLSDIR/$TYPE/payload${FRAMEWORKDIR}/Python3.framework/Versions/Current/Python"
+else
+  echo "Adding ad-hoc code signing so the framework will run on Apple Silicon..."
+  /usr/bin/find "$TOOLSDIR/$TYPE/payload${FRAMEWORKDIR}/Python3.framework/Versions/${PYTHON_BIN_VERSION}/bin" -type f -perm -u=x -exec /usr/bin/codesign -s - --preserve-metadata=identifier,entitlements,flags,runtime -f {} \;
+  /usr/bin/find "$TOOLSDIR/$TYPE/payload${FRAMEWORKDIR}/Python3.framework/Versions/${PYTHON_BIN_VERSION}/lib" -type f -perm -u=x -exec /usr/bin/codesign -s - --preserve-metadata=identifier,entitlements,flags,runtime -f {} \;
+  /usr/bin/find "$TOOLSDIR/$TYPE/payload${FRAMEWORKDIR}/Python3.framework/Versions/${PYTHON_BIN_VERSION}/lib" -type f -name "*dylib" -exec /usr/bin/codesign -s - --preserve-metadata=identifier,entitlements,flags,runtime -f {} \;
+  /usr/bin/codesign -s - --deep --force --preserve-metadata=identifier,entitlements,flags,runtime "$TOOLSDIR/$TYPE/payload${FRAMEWORKDIR}/Python3.framework/Versions/${PYTHON_BIN_VERSION}/Resources/Python.app"
+  /usr/bin/codesign -s - --force --preserve-metadata=identifier,entitlements,flags,runtime "$TOOLSDIR/$TYPE/payload${FRAMEWORKDIR}/Python3.framework/Versions/${PYTHON_BIN_VERSION}/Python"
+  /usr/bin/codesign -s - --force --preserve-metadata=identifier,entitlements,flags,runtime "$TOOLSDIR/$TYPE/payload${FRAMEWORKDIR}Python3.framework/Versions/Current/Python"
+fi
 
 # Print out some information about the signatures
 /usr/sbin/spctl -a -vvvv "$TOOLSDIR/$TYPE/payload${FRAMEWORKDIR}/Python3.framework/Versions/${PYTHON_BIN_VERSION}/Python"
