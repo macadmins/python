@@ -22,7 +22,6 @@ XCODE_PATH="/Applications/Xcode_15.2.app"
 XCODE_NOTARY_PATH="$XCODE_PATH/Contents/Developer/usr/bin/notarytool"
 XCODE_STAPLER_PATH="$XCODE_PATH/Contents/Developer/usr/bin/stapler"
 NEWSUBBUILD=$((80620 + $(/usr/bin/git rev-parse HEAD~0 | xargs -I{} /usr/bin/git rev-list --count {})))
-TOOLSDIR=$(dirname $0)
 
 # Sanity Checks
 ## Type Check
