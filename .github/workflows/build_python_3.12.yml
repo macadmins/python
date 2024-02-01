@@ -1,0 +1,89 @@
+name: Build Python 3.12
+
+env:
+  TYPE: "recommended"
+  DEV_INSTALLER_ID: "Developer ID Installer: Mac Admins Open Source (T4SK8ZXCXG)"
+  DEV_APPLICATION_ID: "Developer ID Application: Mac Admins Open Source (T4SK8ZXCXG)"
+  NOTARY_PASS: ${{ secrets.NOTARY_PASS }}
+  PYTHON_VERSION: "3.12.1"
+
+on:
+  workflow_dispatch:
+  pull_request:
+
+jobs:
+  build:
+    runs-on: macos-13
+
+    steps:
+    - name: Checkout python repo
+      uses: actions/checkout@24cb9080177205b6e8c946b17badbe402adc938f # v3.4.0
+      with:
+        fetch-depth: 0
+
+    - name: Install Apple Developer ID Application certificates
+      uses: apple-actions/import-codesign-certs@8f3fb608891dd2244cdab3d69cd68c0d37a7fe93 # v2.0.0
+      with:
+        keychain-password: ${{ github.run_id }}
+        p12-file-base64: ${{ secrets.APP_CERTIFICATES_P12_MAOS }}
+        p12-password: ${{ secrets.APP_CERTIFICATES_P12_PASSWORD_MAOS }}
+
+    - name: Install Apple Developer ID Installer certificates
+      uses: apple-actions/import-codesign-certs@8f3fb608891dd2244cdab3d69cd68c0d37a7fe93 # v2.0.0
+      with:
+        create-keychain: false # do not create a new keychain for this value
+        keychain-password: ${{ github.run_id }}
+        p12-file-base64: ${{ secrets.PKG_CERTIFICATES_P12_MAOS }}
+        p12-password: ${{ secrets.PKG_CERTIFICATES_P12_PASSWORD_MAOS }}
+
+    - name: Run build package script
+      run: ./build_python_framework_pkgs.zsh "$TYPE" "$DEV_INSTALLER_ID" "$DEV_APPLICATION_ID" "$PYTHON_VERSION" "${NOTARY_PASS}"
+
+    - name: get environment variables
+      id: get_env_var
+      run: |
+         echo "PYTHON_BUILD_VERSION=$(/bin/cat ./build_info.txt)" >> $GITHUB_ENV
+
+    - name: Generate changelog
+      id: changelog
+      uses: metcalfc/changelog-generator@afdcb9470aebdb2252c0c95a1c130723c9e21f3a # v4.1
+      with:
+        myToken: ${{ secrets.GITHUB_TOKEN }}
+        reverse: 'true'
+
+    - name: Create Release
+      id: create_release
+      uses: softprops/action-gh-release@de2c0eb89ae2a093876385947365aca7b0e5f844 # v0.1.15
+      with:
+        name: Python ${{env.PYTHON_BUILD_VERSION}}
+        tag_name: v${{env.PYTHON_BUILD_VERSION}}
+        draft: false
+        prerelease: true
+        token: ${{ secrets.GITHUB_TOKEN }}
+        body: |
+            # Notes
+            Python ${{env.PYTHON_VERSION}} Framework
+
+            ## Changes
+            - Upgraded Python to 3.12.1
+            **Note: Some of these updates may have breaking changes. Always test your code before deploying to production!**
+            
+            Please see the `requirements_recommended.txt` for the current libraries being used.
+            
+            ${{ steps.changelog.outputs.changelog }}
+
+            # Flavors of Python
+            At this time, the automated build process will **only** create the Recommended package
+
+            ## Recommended
+            This is a Python.framework that contains everything from minimal, and a few libraries that various well known open source projects require.
+
+            ## Signing/Notarization
+            The signed package is fully notarized, including the Python.framework file
+        files: ${{github.workspace}}/outputs/*.pkg
+
+    - name: Upload packages
+      uses: actions/upload-artifact@0b7f8abb1508181956e8e162db84b466c27e18ce # v3.1.2
+      with:
+        name: packages
+        path: outputs/
