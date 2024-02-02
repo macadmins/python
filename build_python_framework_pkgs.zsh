@@ -137,6 +137,26 @@ else
   /usr/bin/sudo /usr/sbin/chown -R ${CONSOLEUSER}:wheel "$TOOLSDIR/$TYPE"
 fi
 
+# make a symbolic link to help with interactive use
+if [[ "${PYTHON_MAJOR_VERSION}" == "3.9" ]]; then
+  /bin/ln -s "$PYTHON_BIN" "$TOOLSDIR/$TYPE/payload/usr/local/bin/managed_python3"
+fi
+if [[ "${PYTHON_MAJOR_VERSION}" == "3.10" ]]; then
+  /bin/ln -s "$PYTHON_BIN" "$TOOLSDIR/$TYPE/payload/usr/local/bin/managed_python3"
+fi
+if [[ "${PYTHON_MAJOR_VERSION}" == "3.11" ]]; then
+  /bin/cp "$TOOLSDIR/python-$PYTHON_MAJOR_VERSION" "$TOOLSDIR/$TYPE/payload/usr/local/bin/managed_python3"
+fi
+if [[ "${PYTHON_MAJOR_VERSION}" == "3.12" ]]; then
+  /bin/cp "$TOOLSDIR/python-$PYTHON_MAJOR_VERSION" "$TOOLSDIR/$TYPE/payload/usr/local/bin/managed_python3"
+fi
+
+SB_RESULT="$?"
+if [ "${SB_RESULT}" != "0" ]; then
+    echo "Failed create managed_python3 object" 1>&2
+    exit 1
+fi
+
 # build the framework
 # Force the C path depending on the version of Python to allow tools like cffi/xattr to build without wheels otherwise it errors
 # Can't use Apple's headers for 3.10 and higher as they are (currently) 3.9
@@ -157,26 +177,6 @@ C_INCLUDE_PATH="/Library/ManagedFrameworks/Python/Python.framework/Versions/Curr
 RP_RESULT="$?"
 if [ "${RP_RESULT}" != "0" ]; then
     echo "Error running relocatable-python tool: ${RP_RESULT}" 1>&2
-    exit 1
-fi
-
-# make a symbolic link to help with interactive use
-if [[ "${PYTHON_MAJOR_VERSION}" == "3.9" ]]; then
-  /bin/ln -s "$PYTHON_BIN" "$TOOLSDIR/$TYPE/payload/usr/local/bin/managed_python3"
-fi
-if [[ "${PYTHON_MAJOR_VERSION}" == "3.10" ]]; then
-  /bin/ln -s "$PYTHON_BIN" "$TOOLSDIR/$TYPE/payload/usr/local/bin/managed_python3"
-fi
-if [[ "${PYTHON_MAJOR_VERSION}" == "3.11" ]]; then
-  /bin/cp "$TOOLSDIR/python-$PYTHON_MAJOR_VERSION}" "$TOOLSDIR/$TYPE/payload/usr/local/bin/managed_python3"
-fi
-if [[ "${PYTHON_MAJOR_VERSION}" == "3.12" ]]; then
-  /bin/cp "$PYTHON_BIN" "$TOOLSDIR/$TYPE/payload/usr/local/bin/managed_python3"
-fi
-
-SB_RESULT="$?"
-if [ "${SB_RESULT}" != "0" ]; then
-    echo "Failed create managed_python3 object" 1>&2
     exit 1
 fi
 
@@ -286,6 +286,7 @@ SIGNED_JSONFILE
   PKG_RESULT="$?"
   if [ "${PKG_RESULT}" != "0" ]; then
     echo "Could not sign package: ${PKG_RESULT}" 1>&2
+    exit 1
   else
     if [ -n "$5" ]; then
       # Notarize and staple the package
