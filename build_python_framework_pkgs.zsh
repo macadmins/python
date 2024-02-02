@@ -147,10 +147,12 @@ if [[ "${PYTHON_MAJOR_VERSION}" == "3.10" ]]; then
   /bin/ln -s "$PYTHON_BIN" "$TOOLSDIR/$TYPE/payload/usr/local/bin/managed_python3"
 fi
 if [[ "${PYTHON_MAJOR_VERSION}" == "3.11" ]]; then
-  /bin/cp "$TOOLSDIR/python-$PYTHON_MAJOR_VERSION" "$TOOLSDIR/$TYPE/payload/usr/local/bin/managed_python3"
+  # /bin/cp "$TOOLSDIR/python-$PYTHON_MAJOR_VERSION" "$TOOLSDIR/$TYPE/payload/usr/local/bin/managed_python3"
+  /bin/ln -s "$PYTHON_BIN" "$TOOLSDIR/$TYPE/payload/usr/local/bin/managed_python3"
 fi
 if [[ "${PYTHON_MAJOR_VERSION}" == "3.12" ]]; then
-  /bin/cp "$TOOLSDIR/python-$PYTHON_MAJOR_VERSION" "$TOOLSDIR/$TYPE/payload/usr/local/bin/managed_python3"
+  # /bin/cp "$TOOLSDIR/python-$PYTHON_MAJOR_VERSION" "$TOOLSDIR/$TYPE/payload/usr/local/bin/managed_python3"
+  /bin/ln -s "$PYTHON_BIN" "$TOOLSDIR/$TYPE/payload/usr/local/bin/managed_python3"
 fi
 
 SB_RESULT="$?"
