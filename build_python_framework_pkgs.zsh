@@ -128,10 +128,12 @@ fi
 # remove existing Python package folders and recreate
 if [ -d "$TOOLSDIR/$TYPE" ]; then
     /bin/rm -rf "$TOOLSDIR/$TYPE"
+    /bin/mkdir -p "$TOOLSDIR/$TYPE/scripts"
     /bin/mkdir -p "$TOOLSDIR/$TYPE/payload${FRAMEWORKDIR}"
     /bin/mkdir -p "$TOOLSDIR/$TYPE/payload/usr/local/bin"
     /usr/bin/sudo /usr/sbin/chown -R ${CONSOLEUSER}:wheel "$TOOLSDIR/$TYPE"
 else
+  /bin/mkdir -p "$TOOLSDIR/$TYPE/scripts"
   /bin/mkdir -p "$TOOLSDIR/$TYPE/payload${FRAMEWORKDIR}"
   /bin/mkdir -p "$TOOLSDIR/$TYPE/payload/usr/local/bin"
   /usr/bin/sudo /usr/sbin/chown -R ${CONSOLEUSER}:wheel "$TOOLSDIR/$TYPE"
@@ -261,6 +263,9 @@ fi
 
 # Create outputs folder
 /bin/mkdir -p "$TOOLSDIR/outputs"
+
+# 
+/bin/cp "${TOOLSDIR}/preinstall-cleanup" "$TOOLSDIR/$TYPE/scripts/preinstall"
 
 if [ -n "$2" ]; then
   # Create the json file for munki-pkg (signed)
