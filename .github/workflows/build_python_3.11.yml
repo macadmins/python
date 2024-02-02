@@ -38,7 +38,7 @@ jobs:
         p12-password: ${{ secrets.PKG_CERTIFICATES_P12_PASSWORD_MAOS }}
 
     - name: Run build package script
-      run: ./build_python_framework_pkgs.zsh "$TYPE" "$DEV_INSTALLER_ID" "$DEV_APPLICATION_ID" "$PYTHON_VERSION" "${NOTARY_APP_PASSWORD}"
+      run: ./build_python_framework_pkgs.zsh "$TYPE" "$DEV_INSTALLER_ID" "$DEV_APPLICATION_ID" "$PYTHON_VERSION" "$PYTHON_MAJOR_VERSION" "${NOTARY_APP_PASSWORD}"
 
     - name: get environment variables
       id: get_env_var
