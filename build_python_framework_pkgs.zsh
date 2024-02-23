@@ -14,6 +14,7 @@ PYTHON_BASEURL="https://www.python.org/ftp/python/%s/python-%s${PYTHON_PRERELEAS
 # Hardcoded paths
 FRAMEWORKDIR="/Library/ManagedFrameworks/Python"
 PYTHON_BIN="$FRAMEWORKDIR/Python3.framework/Versions/Current/bin/python3"
+PYTHON_BIN_NEW="$FRAMEWORKDIR/Python3.framework/Versions/Current/Resources/Python.app/Contents/MacOS/Python"
 RP_BINDIR="/tmp/relocatable-python"
 MP_BINDIR="/tmp/munki-pkg"
 CONSOLEUSER=$(/usr/bin/stat -f "%Su" /dev/console)
@@ -141,16 +142,18 @@ fi
 
 # make a symbolic link to help with interactive use
 if [[ "${PYTHON_MAJOR_VERSION}" == "3.9" ]]; then
-  /bin/ln -s "$PYTHON_BIN" "$TOOLSDIR/$TYPE/payload/usr/local/bin/managed_python3"
+  /bin/ln -s "$PYTHON_BIN_NEW" "$TOOLSDIR/$TYPE/payload/usr/local/bin/managed_python3"
 fi
 if [[ "${PYTHON_MAJOR_VERSION}" == "3.10" ]]; then
-  /bin/ln -s "$PYTHON_BIN" "$TOOLSDIR/$TYPE/payload/usr/local/bin/managed_python3"
+  /bin/ln -s "$PYTHON_BIN_NEW" "$TOOLSDIR/$TYPE/payload/usr/local/bin/managed_python3"
 fi
 if [[ "${PYTHON_MAJOR_VERSION}" == "3.11" ]]; then
-  /bin/cp "$TOOLSDIR/python-$PYTHON_MAJOR_VERSION" "$TOOLSDIR/$TYPE/payload/usr/local/bin/managed_python3"
+  /bin/ln -s "$PYTHON_BIN_NEW" "$TOOLSDIR/$TYPE/payload/usr/local/bin/managed_python3"
+  # /bin/cp "$TOOLSDIR/python-$PYTHON_MAJOR_VERSION" "$TOOLSDIR/$TYPE/payload/usr/local/bin/managed_python3"
 fi
 if [[ "${PYTHON_MAJOR_VERSION}" == "3.12" ]]; then
-  /bin/cp "$TOOLSDIR/python-$PYTHON_MAJOR_VERSION" "$TOOLSDIR/$TYPE/payload/usr/local/bin/managed_python3"
+  /bin/ln -s "$PYTHON_BIN_NEW" "$TOOLSDIR/$TYPE/payload/usr/local/bin/managed_python3"
+  # /bin/cp "$TOOLSDIR/python-$PYTHON_MAJOR_VERSION" "$TOOLSDIR/$TYPE/payload/usr/local/bin/managed_python3"
 fi
 
 SB_RESULT="$?"
