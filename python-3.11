@@ -1,7 +1,0 @@
-#!/bin/zsh
-
-bin="/Library/ManagedFrameworks/Python/Python3.framework/Versions/3.11/bin/python3.11"
-
-PYTHONHOME=/Library/ManagedFrameworks/Python.framework/Versions/3.11
-PYTHONPATH=/Library/ManagedFrameworks/Python.framework/Versions/3.11/lib/python3.11/lib-dynload
-exec "${bin}" "$@"
