@@ -1,6 +1,6 @@
 certifi==2023.7.22
 charset-normalizer==2.1.1
 idna==3.4
-requests==2.31.0
+requests==2.32.0
 slacker==0.14.0
 urllib3==1.26.18
