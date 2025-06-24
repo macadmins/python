@@ -98,7 +98,7 @@ if [ -d "${PIPCACHEDIR}" ]; then
 fi
 
 # # kill homebrew packages
-# /usr/local/bin/brew remove --force $(/usr/local/bin/brew list)
+/usr/local/bin/brew remove --force $(/usr/local/bin/brew list)
 
 # Ensure Xcode is set to run-time
 sudo xcode-select -s "$XCODE_PATH"
