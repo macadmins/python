@@ -97,7 +97,7 @@ if [ -d "${PIPCACHEDIR}" ]; then
     /usr/bin/sudo /bin/rm -rf "${PIPCACHEDIR}"
 fi
 
-# # kill homebrew packages
+# kill homebrew packages
 /usr/local/bin/brew remove --force $(/usr/local/bin/brew list)
 
 # Ensure Xcode is set to run-time
