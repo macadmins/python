@@ -6,7 +6,7 @@
 # Run this with your current directory being the path where this script is located
 
 # Harcoded (commit) versions of relocatable-python & munki-pkg
-RP_SHA="8ee72fe3a5dbef733365370ebf44f25022b895ef" # https://github.com/gregneagle/relocatable-python/commits/main/
+RP_SHA="fb4dd9b024b249c71713f14d887f4bcea78aa8b0" # https://github.com/gregneagle/relocatable-python/commits/main/
 MP_SHA="96cffb4eac9207c1130404ec1fee8f4777fa38fd" # https://github.com/munki/munki-pkg/commits/main/
 MACOS_VERSION=11 # use 10.9 for non-universal
 PYTHON_PRERELEASE_VERSION=
