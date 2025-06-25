@@ -5,9 +5,9 @@
 # IMPORTANT
 # Run this with your current directory being the path where this script is located
 
-# Harcoded versions
-RP_SHA="fb4dd9b024b249c71713f14d887f4bcea78aa8b0"
-MP_SHA="0fcd47faf0fb2b4e8a0256a77be315a3cb6ab319"
+# Harcoded (commit) versions of relocatable-python & munki-pkg
+RP_SHA="8ee72fe3a5dbef733365370ebf44f25022b895ef" # https://github.com/gregneagle/relocatable-python/commits/main/
+MP_SHA="96cffb4eac9207c1130404ec1fee8f4777fa38fd" # https://github.com/munki/munki-pkg/commits/main/
 MACOS_VERSION=11 # use 10.9 for non-universal
 PYTHON_PRERELEASE_VERSION=
 PYTHON_BASEURL="https://www.python.org/ftp/python/%s/python-%s${PYTHON_PRERELEASE_VERSION}-macos%s.pkg"
@@ -20,6 +20,8 @@ MP_BINDIR="/tmp/munki-pkg"
 CONSOLEUSER=$(/usr/bin/stat -f "%Su" /dev/console)
 PIPCACHEDIR="/Users/${CONSOLEUSER}/Library/Caches/pip"
 XCODE_PATH="/Applications/Xcode_15.2.app"
+# XCODE_PATH="/Applications/Xcode.app"
+# XCODE_BUILD_PATH="$XCODE_PATH/Contents/Developer/usr/bin/xcodebuild"
 XCODE_NOTARY_PATH="$XCODE_PATH/Contents/Developer/usr/bin/notarytool"
 XCODE_STAPLER_PATH="$XCODE_PATH/Contents/Developer/usr/bin/stapler"
 NEWSUBBUILD=$((80620 + $(/usr/bin/git rev-parse HEAD~0 | xargs -I{} /usr/bin/git rev-list --count {})))
@@ -56,13 +58,13 @@ fi
 if [ -n "$4" ]; then
   PYTHON_VERSION=$4
 else
-  PYTHON_VERSION=3.12.1
+  PYTHON_VERSION=3.13.5
 fi
 
 if [ -n "$5" ]; then
   PYTHON_MAJOR_VERSION=$5
 else
-  PYTHON_MAJOR_VERSION=3.12
+  PYTHON_MAJOR_VERSION=3.13
 fi
 # Set python bin version based on PYTHON_VERSION
 PYTHON_BIN_VERSION="${PYTHON_VERSION%.*}"
@@ -96,7 +98,7 @@ if [ -d "${PIPCACHEDIR}" ]; then
     /usr/bin/sudo /bin/rm -rf "${PIPCACHEDIR}"
 fi
 
-# kill homebrew packages
+# kill homebrew packages on GitHub runner
 /usr/local/bin/brew remove --force $(/usr/local/bin/brew list)
 
 # Ensure Xcode is set to run-time
@@ -151,6 +153,9 @@ if [[ "${PYTHON_MAJOR_VERSION}" == "3.11" ]]; then
   /bin/ln -s "$PYTHON_BIN_NEW" "$TOOLSDIR/$TYPE/payload/usr/local/bin/managed_python3"
 fi
 if [[ "${PYTHON_MAJOR_VERSION}" == "3.12" ]]; then
+  /bin/ln -s "$PYTHON_BIN_NEW" "$TOOLSDIR/$TYPE/payload/usr/local/bin/managed_python3"
+fi
+if [[ "${PYTHON_MAJOR_VERSION}" == "3.13" ]]; then
   /bin/ln -s "$PYTHON_BIN_NEW" "$TOOLSDIR/$TYPE/payload/usr/local/bin/managed_python3"
 fi
 
@@ -236,6 +241,7 @@ else
   /usr/bin/codesign -s - --deep --force --preserve-metadata=identifier,entitlements,flags,runtime "$TOOLSDIR/$TYPE/payload${FRAMEWORKDIR}/Python3.framework/Versions/${PYTHON_BIN_VERSION}/Resources/Python.app"
   /usr/bin/codesign -s - --force --preserve-metadata=identifier,entitlements,flags,runtime "$TOOLSDIR/$TYPE/payload${FRAMEWORKDIR}/Python3.framework/Versions/${PYTHON_BIN_VERSION}/Python"
   /usr/bin/codesign -s - --force --preserve-metadata=identifier,entitlements,flags,runtime "$TOOLSDIR/$TYPE/payload${FRAMEWORKDIR}Python3.framework/Versions/Current/Python"
+  # /usr/bin/codesign -s - --force --preserve-metadata=identifier,entitlements,flags,runtime "$TOOLSDIR/$TYPE/payload${FRAMEWORKDIR}/Python3.framework/Versions/Current/Python"
 fi
 
 # Print out some information about the signatures

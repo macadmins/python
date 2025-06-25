@@ -1,12 +1,12 @@
-name: Build Python 3.10
+name: Build Python 3.12
 
 env:
   TYPE: "recommended"
   DEV_INSTALLER_ID: "Developer ID Installer: Mac Admins Open Source (T4SK8ZXCXG)"
   DEV_APPLICATION_ID: "Developer ID Application: Mac Admins Open Source (T4SK8ZXCXG)"
   NOTARY_APP_PASSWORD: ${{ secrets.NOTARY_APP_PASSWORD_MAOS }}
-  PYTHON_VERSION: "3.10.11"
-  PYTHON_MAJOR_VERSION: "3.10"
+  PYTHON_VERSION: "3.12.1"
+  PYTHON_MAJOR_VERSION: "3.12"
 
 on:
   workflow_dispatch:
@@ -66,15 +66,10 @@ jobs:
             Python ${{env.PYTHON_VERSION}} Framework
 
             ## Changes
-            - Upgraded Python to 3.10.11
+            - Upgraded Python to 3.13.5
             **Note: Some of these updates may have breaking changes. Always test your code before deploying to production!**
             
             Please see the `requirements_recommended.txt` for the current libraries being used.
-
-            ## Security Notice
-            The python org [does not provide macOS packages for Python 3.10.12 and higher](https://www.python.org/downloads/release/python-31012/). This means that this project cannot use the most recent version of Python 3.10 with all security updates. Proceed with caution when using this release.
-            
-            > According to the release calendar specified in PEP 619, Python 3.10 is now in the "security fixes only" stage of its life cycle: the 3.10 branch only accepts security fixes and releases of those are made irregularly in source-only form until October 2026. Python 3.10 isn't receiving regular bug fixes anymore, and binary installers are no longer provided for it. Python 3.10.11 was the last full bugfix release of Python 3.10 with binary installers.
             
             ${{ steps.changelog.outputs.changelog }}
 
