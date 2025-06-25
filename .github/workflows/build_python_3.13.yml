@@ -1,4 +1,4 @@
-name: Build Python 3.12
+name: Build Python 3.13
 
 env:
   TYPE: "recommended"
