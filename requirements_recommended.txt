@@ -36,6 +36,7 @@ requests==2.32.4
 six==1.17.0
 tokenize-rt==6.2.0
 tomli==2.2.1
+--no-binary tomli
 urllib3==2.5.0
 virtualenv==20.31.2
 xattr==1.1.4
