@@ -139,6 +139,15 @@ build_framework() {
         "$TOOLSDIR/$TYPE/payload${FRAMEWORKDIR}/Python3.framework"
 }
 
+install_sitecustomize() {
+    # Drop a sitecustomize.py that points OpenSSL at certifi's CA bundle via
+    # SSL_CERT_FILE at interpreter startup. Works around macadmins/python#38:
+    # python.org's framework has the OpenSSL CA path compiled in to
+    # /Library/Frameworks/... which doesn't match our relocated install.
+    local site_packages="$TOOLSDIR/$TYPE/payload${FRAMEWORKDIR}/Python3.framework/Versions/${PYTHON_BIN_VERSION}/lib/python${PYTHON_BIN_VERSION}/site-packages"
+    /bin/cp "${TOOLSDIR}/managed_python_sitecustomize.py" "$site_packages/sitecustomize.py"
+}
+
 codesign_framework() {
     local identity="${APPLICATION_ID:--}"   # `-` means ad-hoc
     local framework_root="$TOOLSDIR/$TYPE/payload${FRAMEWORKDIR}/Python3.framework"
@@ -274,6 +283,7 @@ download_tool munki-pkg "$MP_SHA" \
     "https://github.com/munki/munki-pkg/archive/${MP_SHA}.zip" \
     "$MP_ZIP" "$MP_BINDIR"
 build_framework
+install_sitecustomize
 codesign_framework
 build_pkg
 notarize_and_staple
