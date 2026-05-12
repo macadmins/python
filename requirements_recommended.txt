@@ -28,6 +28,7 @@ isort==8.0.1; python_version >= "3.10"
 isort==6.1.0; python_version < "3.10"
 mccabe==0.7.0
 mypy-extensions==1.1.0
+--no-binary mypy-extensions
 nodeenv==1.10.0
 packaging==26.2
 pathspec==1.1.1
