@@ -23,14 +23,14 @@ jobs:
         fetch-depth: 0
 
     - name: Install Apple Developer ID Application certificates
-      uses: apple-actions/import-codesign-certs@b2e261033a9e248f91a9b57201e8d1e12b15a24e # v7.0.0
+      uses: apple-actions/import-codesign-certs@5142e029c445c10ffc7149d172e540235a065466 # v7.0.0
       with:
         keychain-password: ${{ github.run_id }}
         p12-file-base64: ${{ secrets.APP_CERTIFICATES_P12_MAOS }}
         p12-password: ${{ secrets.APP_CERTIFICATES_P12_PASSWORD_MAOS }}
 
     - name: Install Apple Developer ID Installer certificates
-      uses: apple-actions/import-codesign-certs@b2e261033a9e248f91a9b57201e8d1e12b15a24e # v7.0.0
+      uses: apple-actions/import-codesign-certs@5142e029c445c10ffc7149d172e540235a065466 # v7.0.0
       with:
         create-keychain: false # do not create a new keychain for this value
         keychain-password: ${{ github.run_id }}
