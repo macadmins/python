@@ -18,19 +18,19 @@ jobs:
 
     steps:
     - name: Checkout python repo
-      uses: actions/checkout@692973e3d937129bcbf40652eb9f2f61becf3332 # v4.1.7
+      uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       with:
         fetch-depth: 0
 
     - name: Install Apple Developer ID Application certificates
-      uses: apple-actions/import-codesign-certs@63fff01cd422d4b7b855d40ca1e9d34d2de9427d # v3.0.0
+      uses: apple-actions/import-codesign-certs@b2e261033a9e248f91a9b57201e8d1e12b15a24e # v7.0.0
       with:
         keychain-password: ${{ github.run_id }}
         p12-file-base64: ${{ secrets.APP_CERTIFICATES_P12_MAOS }}
         p12-password: ${{ secrets.APP_CERTIFICATES_P12_PASSWORD_MAOS }}
 
     - name: Install Apple Developer ID Installer certificates
-      uses: apple-actions/import-codesign-certs@63fff01cd422d4b7b855d40ca1e9d34d2de9427d # v3.0.0
+      uses: apple-actions/import-codesign-certs@b2e261033a9e248f91a9b57201e8d1e12b15a24e # v7.0.0
       with:
         create-keychain: false # do not create a new keychain for this value
         keychain-password: ${{ github.run_id }}
@@ -52,14 +52,14 @@ jobs:
 
     - name: Generate changelog
       id: changelog
-      uses: metcalfc/changelog-generator@afdcb9470aebdb2252c0c95a1c130723c9e21f3a # v4.1
+      uses: metcalfc/changelog-generator@b794d7e4101afb6a8fe5c97eaedaf789d43b1288 # v4.7.0
       with:
         myToken: ${{ secrets.GITHUB_TOKEN }}
         reverse: 'true'
 
     - name: Create Release
       id: create_release
-      uses: softprops/action-gh-release@de2c0eb89ae2a093876385947365aca7b0e5f844 # v0.1.15
+      uses: softprops/action-gh-release@b4309332981a82ec1c5618f44dd2e27cc8bfbfda # v3.0.0
       with:
         name: Python ${{env.PYTHON_BUILD_VERSION}}
         tag_name: v${{env.PYTHON_BUILD_VERSION}}
@@ -97,7 +97,7 @@ jobs:
         files: ${{github.workspace}}/outputs/*.pkg
 
     - name: Upload packages
-      uses: actions/upload-artifact@0b2256b8c012f0828dc542b3febcab082c67f72b # v4.3.4
+      uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
       with:
         name: packages
         path: outputs/
