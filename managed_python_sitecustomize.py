@@ -21,16 +21,25 @@ What it does:
     startup. OpenSSL reads SSL_CERT_FILE ahead of its compiled-in path, so
     stdlib SSL operations get a working CA bundle.
 
-    Only sets the variable when it isn't already set, so an explicit user
-    override (e.g. `export SSL_CERT_FILE=/path/to/ca.pem`) still wins.
+    Falls back to certifi only when SSL_CERT_FILE is unset OR points at a
+    path that doesn't exist on disk. A valid user override (e.g. a corporate
+    CA bundle at `export SSL_CERT_FILE=/opt/corp/ca.pem`) is preserved;
+    a stale or typo'd path gets corrected to certifi.
 
 References:
     macadmins/python#38
     gregneagle/relocatable-python#13
 """
 import os
+import os.path
 
-if "SSL_CERT_FILE" not in os.environ:
+
+def _ssl_cert_file_is_valid():
+    path = os.environ.get("SSL_CERT_FILE")
+    return bool(path) and os.path.isfile(path)
+
+
+if not _ssl_cert_file_is_valid():
     try:
         import certifi
     except ImportError:
