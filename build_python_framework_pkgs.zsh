@@ -9,7 +9,7 @@
 set -eu
 
 # --- Pinned upstream commits ---
-RP_SHA="fb4dd9b024b249c71713f14d887f4bcea78aa8b0"  # gregneagle/relocatable-python
+RP_SHA="8ee72fe3a5dbef733365370ebf44f25022b895ef"  # gregneagle/relocatable-python
 MP_SHA="bbd07730d1b93ed3828246575ef5676bba74b5d1"  # munki/munki-pkg
 
 # --- Paths and constants ---
@@ -132,7 +132,6 @@ build_framework() {
         --python-version "${PYTHON_VERSION}" \
         --os-version 11 \
         --upgrade-pip \
-        --no-unsign \
         --pip-requirements "${TOOLSDIR}/requirements_${TYPE}.txt" \
         --destination "${FRAMEWORKDIR}"
 
