@@ -44,7 +44,7 @@ pyobjc==12.1; python_version >= "3.10"
 pyobjc==11.1; python_version < "3.10"
 PyYAML==6.0.3
 --no-binary PyYAML
-requests==2.34.0; python_version >= "3.10"
+requests==2.33.0; python_version >= "3.10"
 requests==2.32.5; python_version < "3.10"
 six==1.17.0
 tokenize-rt==6.2.0
