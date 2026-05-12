@@ -226,13 +226,11 @@ pyobjc==12.1; python_version >= "3.10"
 pyobjc==11.1; python_version < "3.10"
 ```
 
-This is the only holdback discovered. All other native-code packages (`cffi`, `charset-normalizer`, `PyYAML`, `tomli`, `xattr`) ship universal2 wheels for cp39 through cp314 at their latest versions; pure-Python packages install on any Python 3.x. Fixed in `f9c0853`.
+A second sweep during cross-version validation surfaced 12 more packages whose latest versions declare `requires_python >= 3.10`: `black`, `cfgv`, `click`, `filelock`, `flake8-bugbear`, `identify`, `isort`, `platformdirs`, `pre-commit`, `pycparser`, `requests`, `urllib3`. Each got the same dual-pin treatment, pinning the latest 3.9-compatible release for `python_version < "3.10"`. 3.10 / 3.11 / 3.12 / 3.13 / 3.14 use the modern pins unchanged. Fixed in `f9c0853` (pyobjc) and `f83f774` (the other 12).
 
 ### Acceptance criteria — actual results
 
-- ✅ `./build_python_framework_pkgs.zsh --python-version 3.13.13` succeeds end-to-end on Apple Silicon, produces an installable framework zip, and the resulting `managed_python3` runs `import objc, xattr, requests, yaml` on arm64.
-- ✅ Same for 3.14.5.
-- ⏳ Cross-version validation for 3.9 / 3.10 / 3.11 / 3.12 — pending local runs.
+- ✅ `./build_python_framework_pkgs.zsh --python-version <X.Y.Z>` succeeds end-to-end on Apple Silicon for all six supported Python versions (3.9.13, 3.10.11, 3.11.9, 3.12.10, 3.13.13, 3.14.5). Each produces an installable framework zip; `managed_python3 --version` reports the correct version, `platform.machine()` returns `arm64`, and `import objc, xattr, requests, yaml` succeeds in every framework. Test record: `docs/superpowers/plans/2026-05-11-apple-silicon-modernization-tests.md`.
 - ✅ Five workflow files updated to long-flag invocation; `build_python_3.14.yml` added.
 - ✅ Dependabot enabled for GitHub Actions.
 - ⏳ Final releases for 3.9 / 3.10 — pending the manual `workflow_dispatch` after merge.
