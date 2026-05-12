@@ -231,11 +231,20 @@ echo "Shared objects are confirmed as universal"
 #   - Do NOT sign Versions/Current/Python; it's a symlink to Versions/X.Y/Python
 #     which we just signed. Re-signing through the symlink double-signs the
 #     same target and corrupts the signature on newer Python frameworks.
+NESTED_FRAMEWORKS_DIR="$TOOLSDIR/$TYPE/payload${FRAMEWORKDIR}/Python3.framework/Versions/${PYTHON_BIN_VERSION}/Frameworks"
 if [ -n "$3" ]; then
   echo "Adding developer id code signing so the framework will run on Apple Silicon..."
   /usr/bin/find "$TOOLSDIR/$TYPE/payload${FRAMEWORKDIR}/Python3.framework/Versions/${PYTHON_BIN_VERSION}/bin" -type f -perm -u=x -exec /usr/bin/codesign --sign "$3" --timestamp --options=runtime --preserve-metadata=identifier,entitlements,flags -f {} \;
   /usr/bin/find "$TOOLSDIR/$TYPE/payload${FRAMEWORKDIR}/Python3.framework/Versions/${PYTHON_BIN_VERSION}/lib" -type f -perm -u=x -exec /usr/bin/codesign --sign "$3" --timestamp --options=runtime --preserve-metadata=identifier,entitlements,flags -f {} \;
   /usr/bin/find "$TOOLSDIR/$TYPE/payload${FRAMEWORKDIR}/Python3.framework/Versions/${PYTHON_BIN_VERSION}/lib" -type f -name "*dylib" -exec /usr/bin/codesign --sign "$3" --timestamp --options=runtime --preserve-metadata=identifier,entitlements,flags -f {} \;
+  # Nested Tcl/Tk frameworks (bundled inside Python 3.13+). install_name_tool
+  # invalidates their python.org signatures during the relocatable rewrite.
+  # Re-sign every Mach-O binary under Frameworks/ before signing the parent
+  # Python binary, so the parent's chain-of-trust over them is valid.
+  if [ -d "$NESTED_FRAMEWORKS_DIR" ]; then
+    /usr/bin/find "$NESTED_FRAMEWORKS_DIR" -type f -perm -u=x -exec /usr/bin/codesign --sign "$3" --timestamp --options=runtime --force {} \;
+    /usr/bin/find "$NESTED_FRAMEWORKS_DIR" -type f -name "*dylib" -exec /usr/bin/codesign --sign "$3" --timestamp --options=runtime --force {} \;
+  fi
   /usr/bin/codesign --sign "$3" --timestamp --options=runtime --deep --force --preserve-metadata=identifier,entitlements,flags "$TOOLSDIR/$TYPE/payload${FRAMEWORKDIR}/Python3.framework/Versions/${PYTHON_BIN_VERSION}/Resources/Python.app"
   /usr/bin/codesign --sign "$3" --timestamp --options=runtime --force --preserve-metadata=identifier,entitlements,flags "$TOOLSDIR/$TYPE/payload${FRAMEWORKDIR}/Python3.framework/Versions/${PYTHON_BIN_VERSION}/Python"
 else
@@ -243,6 +252,10 @@ else
   /usr/bin/find "$TOOLSDIR/$TYPE/payload${FRAMEWORKDIR}/Python3.framework/Versions/${PYTHON_BIN_VERSION}/bin" -type f -perm -u=x -exec /usr/bin/codesign -s - --options=runtime --preserve-metadata=identifier,entitlements,flags -f {} \;
   /usr/bin/find "$TOOLSDIR/$TYPE/payload${FRAMEWORKDIR}/Python3.framework/Versions/${PYTHON_BIN_VERSION}/lib" -type f -perm -u=x -exec /usr/bin/codesign -s - --options=runtime --preserve-metadata=identifier,entitlements,flags -f {} \;
   /usr/bin/find "$TOOLSDIR/$TYPE/payload${FRAMEWORKDIR}/Python3.framework/Versions/${PYTHON_BIN_VERSION}/lib" -type f -name "*dylib" -exec /usr/bin/codesign -s - --options=runtime --preserve-metadata=identifier,entitlements,flags -f {} \;
+  if [ -d "$NESTED_FRAMEWORKS_DIR" ]; then
+    /usr/bin/find "$NESTED_FRAMEWORKS_DIR" -type f -perm -u=x -exec /usr/bin/codesign -s - --options=runtime --force {} \;
+    /usr/bin/find "$NESTED_FRAMEWORKS_DIR" -type f -name "*dylib" -exec /usr/bin/codesign -s - --options=runtime --force {} \;
+  fi
   /usr/bin/codesign -s - --options=runtime --deep --force --preserve-metadata=identifier,entitlements,flags "$TOOLSDIR/$TYPE/payload${FRAMEWORKDIR}/Python3.framework/Versions/${PYTHON_BIN_VERSION}/Resources/Python.app"
   /usr/bin/codesign -s - --options=runtime --force --preserve-metadata=identifier,entitlements,flags "$TOOLSDIR/$TYPE/payload${FRAMEWORKDIR}/Python3.framework/Versions/${PYTHON_BIN_VERSION}/Python"
 fi
