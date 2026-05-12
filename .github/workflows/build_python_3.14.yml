@@ -14,23 +14,23 @@ on:
 
 jobs:
   build:
-    runs-on: macos-14
+    runs-on: macos-26
 
     steps:
     - name: Checkout python repo
-      uses: actions/checkout@24cb9080177205b6e8c946b17badbe402adc938f # v3.4.0
+      uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
       with:
         fetch-depth: 0
 
     - name: Install Apple Developer ID Application certificates
-      uses: apple-actions/import-codesign-certs@8f3fb608891dd2244cdab3d69cd68c0d37a7fe93 # v2.0.0
+      uses: apple-actions/import-codesign-certs@b2e261033a9e248f91a9b57201e8d1e12b15a24e # v7.0.0
       with:
         keychain-password: ${{ github.run_id }}
         p12-file-base64: ${{ secrets.APP_CERTIFICATES_P12_MAOS }}
         p12-password: ${{ secrets.APP_CERTIFICATES_P12_PASSWORD_MAOS }}
 
     - name: Install Apple Developer ID Installer certificates
-      uses: apple-actions/import-codesign-certs@8f3fb608891dd2244cdab3d69cd68c0d37a7fe93 # v2.0.0
+      uses: apple-actions/import-codesign-certs@b2e261033a9e248f91a9b57201e8d1e12b15a24e # v7.0.0
       with:
         create-keychain: false # do not create a new keychain for this value
         keychain-password: ${{ github.run_id }}
@@ -38,7 +38,12 @@ jobs:
         p12-password: ${{ secrets.PKG_CERTIFICATES_P12_PASSWORD_MAOS }}
 
     - name: Run build package script
-      run: ./build_python_framework_pkgs.zsh "$TYPE" "$DEV_INSTALLER_ID" "$DEV_APPLICATION_ID" "$PYTHON_VERSION" "$PYTHON_MAJOR_VERSION" "${NOTARY_APP_PASSWORD}"
+      run: |
+        ./build_python_framework_pkgs.zsh \
+          --python-version "$PYTHON_VERSION" \
+          --installer-id "$DEV_INSTALLER_ID" \
+          --application-id "$DEV_APPLICATION_ID" \
+          --notary-password "$NOTARY_APP_PASSWORD"
 
     - name: get environment variables
       id: get_env_var
@@ -47,14 +52,14 @@ jobs:
 
     - name: Generate changelog
       id: changelog
-      uses: metcalfc/changelog-generator@afdcb9470aebdb2252c0c95a1c130723c9e21f3a # v4.1
+      uses: metcalfc/changelog-generator@b794d7e4101afb6a8fe5c97eaedaf789d43b1288 # v4.7.0
       with:
         myToken: ${{ secrets.GITHUB_TOKEN }}
         reverse: 'true'
 
     - name: Create Release
       id: create_release
-      uses: softprops/action-gh-release@de2c0eb89ae2a093876385947365aca7b0e5f844 # v0.1.15
+      uses: softprops/action-gh-release@b4309332981a82ec1c5618f44dd2e27cc8bfbfda # v3.0.0
       with:
         name: Python ${{env.PYTHON_BUILD_VERSION}}
         tag_name: v${{env.PYTHON_BUILD_VERSION}}
@@ -64,15 +69,13 @@ jobs:
         body: |
             # Notes
             Python ${{env.PYTHON_VERSION}} Framework
+            Python 3.14.5 Framework
 
             ## Changes
             - Upgraded Python to 3.14.5
             **Note: Some of these updates may have breaking changes. Always test your code before deploying to production!**
-            
+
             Please see the `requirements_recommended.txt` for the current libraries being used.
-            
-            ## Final Release
-            **This is the final release of the Python 3.14 framework for Intel macs.** macOS 27 will ship without Intel support so please plan your migration soon.
 
             ${{ steps.changelog.outputs.changelog }}
 
@@ -87,7 +90,7 @@ jobs:
         files: ${{github.workspace}}/outputs/*.pkg
 
     - name: Upload packages
-      uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+      uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
       with:
         name: packages
         path: outputs/
