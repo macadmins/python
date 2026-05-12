@@ -847,3 +847,32 @@ Nothing to commit — these are CI-side actions only. Phase 3 work (archiving th
 - Phase 3 explicitly excluded: workflow consolidation, runner migration, action bumps, release-trigger change — Task 7 Step 4 includes a deliberate stopgap (long-flag invocation inside the still-duplicated workflows) so CI keeps working in the in-between state.
 - No placeholders: every code block is concrete; every `Expected:` describes verifiable output.
 - Type / name consistency: long-flag names (`--python-version`, `--installer-id`, `--application-id`, `--notary-password`, `--xcode-path`) are identical across Tasks 1, 7, and 9.
+
+---
+
+## Post-Implementation Notes (2026-05-11)
+
+Tasks 1–11 are complete on branch `claude`. Task 12 is pending the branch push + merge.
+
+### Deltas from the original plan text above
+
+- **Task 1 — Script content has three additional fixes** layered onto the version this plan documents:
+  - `PYTHON_BASEURL` keeps three `%s` slots (not the two-slot literal `macos11` version). Commit `e611fb1`.
+  - `prepare_build_dirs()` explicitly `chmod 777`s `FRAMEWORKDIR` after `mkdir`. Commit `3057706`.
+  - The `--no-unsign` flag was removed from the `make_relocatable_python_framework.py` invocation; it was disabling relocatable-python's ad-hoc re-sign step that satisfies Apple Silicon Gatekeeper. Commit `69af8f1`.
+  - `build_pkg()` now `mv`s the produced `.pkg` to `outputs/` directly so signed-but-unnotarized builds survive `cleanup()`. Commit `29b3a55`.
+
+  See the design spec's "Validation Findings" section for the full reasoning.
+
+- **Task 7 Step 4 — Workflow `run:` block** now matches the spec exactly; the in-between-window stopgap (long-flag invocation inside the still-duplicated workflows) is in place across all six workflow files. Commits `c10dc22`, `590f478`, `1764c84`.
+
+- **Task 9 — Release notes** also include a corrected "Recommended flavor" description, since the original `… everything from minimal …` line referenced a flavor that no longer exists. The fix went into the same commit as the final-release notice.
+
+- **Task 10 — Pin sweep was pulled forward** and merged with the initial 3.13.13 / 3.14.5 validation (commit `1216394`). The cross-version follow-up (commit `f9c0853`) added one holdback: `pyobjc==11.1; python_version < "3.10"`, since `pyobjc 12.1` declares `requires_python >= 3.10` and `pyobjc-core 12.1` lacks a cp39 wheel. Every other native-code package (`cffi`, `charset-normalizer`, `PyYAML`, `tomli`, `xattr`) ships universal2 wheels for cp39 through cp314 at latest.
+
+- **Task 12 — Still pending.** Branch is local-only; releases will be dispatched after push + merge.
+
+### Open follow-ups
+
+- `RP_SHA` is held at `8ee72fe` (latest available). When upstream addresses [gregneagle/relocatable-python#32](https://github.com/gregneagle/relocatable-python/issues/32), revisit whether further bumps are possible.
+- Phase 3 (CI/CD overhaul) is its own design exercise.

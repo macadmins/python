@@ -192,3 +192,52 @@ Phase 2 is done when:
 - `build_python_3.14.yml` exists and runs green end-to-end.
 - 3.9.13 and 3.10.11 each have one final release published with "final release" notes.
 - `.github/dependabot.yml` is enabled for GitHub Actions.
+
+## Validation Findings (post-implementation, 2026-05-11)
+
+The Phase 1 + Phase 2 implementation surfaced four bugs and one design refinement that the earlier sections don't reflect. All are fixed in code; this section is the authoritative record of why each change was made.
+
+### 1. `PYTHON_BASEURL` needs three `%s` slots, not two
+
+The URL template must be `https://www.python.org/ftp/python/%s/python-%s-macos%s.pkg`. `relocatable-python`'s `locallibs/get.py` passes (version, version, os-version) into `base_url % (...)`. An earlier refactor that hardcoded `macos11` left only two slots and raised `TypeError: not all arguments converted during string formatting` at framework-download time. Fixed in `e611fb1`.
+
+### 2. `mkdir -m 777 -p` does not chmod existing directories
+
+`prepare_build_dirs()` must `mkdir -p` and then `chmod 777` explicitly. The `-m 777` flag only applies to newly created directories; an existing `/Library/ManagedFrameworks/Python/` (from a prior install) keeps its stricter perms, causing `relocatable-python` to fail with `Permission denied` when it ditto-extracts the python.org pkg into the framework. Fixed in `3057706`.
+
+### 3. `--no-unsign` is incompatible with Apple Silicon Gatekeeper
+
+The original Phase 1 design kept `--no-unsign` in the `make_relocatable_python_framework.py` invocation to "preserve the python.org signature". In practice, `install_name_tool` invalidates that signature whether the flag is set or not; the flag's only behavioral effect is to *disable* `relocatable-python`'s own `fix_broken_signatures` step (`locallibs/fix.py`), which ad-hoc re-signs the modified binaries before `ensurepip` runs.
+
+Without that re-sign, Apple Silicon's Gatekeeper SIGKILLs the Python binary when `ensurepip` tries to execute it. This is the upstream issue [gregneagle/relocatable-python#32](https://github.com/gregneagle/relocatable-python/issues/32). Solution: drop `--no-unsign`. The intermediate ad-hoc signature is overwritten by our `codesign_framework()` step at the end, so the final artifact's signature comes from our Developer ID. Fixed in `69af8f1`.
+
+This problem only manifests on Apple Silicon hosts; prior Intel CI runs masked it because Intel Gatekeeper is more lenient about invalid signatures. Switching the build host architecture is part of what this whole modernization exists to enable.
+
+### 4. Signed `.pkg` must move to `outputs/` from `build_pkg()`, not `notarize_and_staple()`
+
+The pre-refactor script moved the produced `.pkg` to `outputs/` unconditionally after `munkipkg` succeeded. The Phase 1 refactor consolidated that `mv` into `notarize_and_staple()`, which early-returns when no notary password is provided — so a signed-but-unnotarized build had its `.pkg` deleted by `cleanup()` before it ever landed in `outputs/`. The move now happens at the end of `build_pkg()`; `notarize_and_staple()` operates on the `.pkg` in its final location. Fixed in `29b3a55`.
+
+### 5. pyobjc holdback for Python 3.9
+
+The Phase 2 pin sweep aspirationally bumped every package to PyPI latest. That works for 3.10 → 3.14 universally, but `pyobjc 12.1` declares `requires_python >= 3.10` and `pyobjc-core 12.1` lacks a cp39 wheel — the Python 3.9 final-release build would fail at pip-install time. Resolution in `requirements_recommended.txt`:
+
+```
+pyobjc==12.1; python_version >= "3.10"
+pyobjc==11.1; python_version < "3.10"
+```
+
+This is the only holdback discovered. All other native-code packages (`cffi`, `charset-normalizer`, `PyYAML`, `tomli`, `xattr`) ship universal2 wheels for cp39 through cp314 at their latest versions; pure-Python packages install on any Python 3.x. Fixed in `f9c0853`.
+
+### Acceptance criteria — actual results
+
+- ✅ `./build_python_framework_pkgs.zsh --python-version 3.13.13` succeeds end-to-end on Apple Silicon, produces an installable framework zip, and the resulting `managed_python3` runs `import objc, xattr, requests, yaml` on arm64.
+- ✅ Same for 3.14.5.
+- ⏳ Cross-version validation for 3.9 / 3.10 / 3.11 / 3.12 — pending local runs.
+- ✅ Five workflow files updated to long-flag invocation; `build_python_3.14.yml` added.
+- ✅ Dependabot enabled for GitHub Actions.
+- ⏳ Final releases for 3.9 / 3.10 — pending the manual `workflow_dispatch` after merge.
+
+### Items rolled over to follow-up work
+
+- **Bump `RP_SHA` past `8ee72fe`** once upstream addresses the Apple Silicon ensurepip flow (tracked: gregneagle/relocatable-python#32).
+- **Phase 3 (CI/CD overhaul)** — workflow consolidation, runner migration to `macos-14`, action version bumps, release trigger change, archival of `build_python_3.9.yml` and `build_python_3.10.yml`. Out of scope for this spec.
