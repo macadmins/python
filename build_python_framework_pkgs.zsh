@@ -96,7 +96,9 @@ prepare_ci_env() {
 }
 
 prepare_build_dirs() {
-    /usr/bin/sudo /bin/mkdir -m 777 -p "$FRAMEWORKDIR"
+    /usr/bin/sudo /bin/mkdir -p "$FRAMEWORKDIR"
+    # mkdir -m only applies to newly created dirs; ensure existing dirs are writable.
+    /usr/bin/sudo /bin/chmod 777 "$FRAMEWORKDIR"
     if [[ -d "$FRAMEWORKDIR/Python.framework" ]]; then
         /usr/bin/sudo /bin/rm -rf "$FRAMEWORKDIR/Python.framework"
     fi
