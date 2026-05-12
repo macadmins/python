@@ -239,11 +239,17 @@ if [ -n "$3" ]; then
   /usr/bin/find "$TOOLSDIR/$TYPE/payload${FRAMEWORKDIR}/Python3.framework/Versions/${PYTHON_BIN_VERSION}/lib" -type f -name "*dylib" -exec /usr/bin/codesign --sign "$3" --timestamp --options=runtime --preserve-metadata=identifier,entitlements,flags -f {} \;
   # Nested Tcl/Tk frameworks (bundled inside Python 3.13+). install_name_tool
   # invalidates their python.org signatures during the relocatable rewrite.
-  # Re-sign every Mach-O binary under Frameworks/ before signing the parent
-  # Python binary, so the parent's chain-of-trust over them is valid.
+  # Sign each nested framework as a bundle (NOT the inner binary alone) so
+  # codesign regenerates the framework's _CodeSignature/CodeResources file
+  # to match the re-signed binary. --deep walks the framework's Versions/
+  # tree and signs the binary at the same time. Without this, signing only
+  # the inner binary leaves the bundle's CodeResources pointing at the old
+  # binary hash → "nested code is modified or invalid".
   if [ -d "$NESTED_FRAMEWORKS_DIR" ]; then
-    /usr/bin/find "$NESTED_FRAMEWORKS_DIR" -type f -perm -u=x -exec /usr/bin/codesign --sign "$3" --timestamp --options=runtime --force {} \;
-    /usr/bin/find "$NESTED_FRAMEWORKS_DIR" -type f -name "*dylib" -exec /usr/bin/codesign --sign "$3" --timestamp --options=runtime --force {} \;
+    for nested_fw in "$NESTED_FRAMEWORKS_DIR"/*.framework; do
+      [ -d "$nested_fw" ] || continue
+      /usr/bin/codesign --sign "$3" --timestamp --options=runtime --force --deep "$nested_fw"
+    done
   fi
   /usr/bin/codesign --sign "$3" --timestamp --options=runtime --deep --force --preserve-metadata=identifier,entitlements,flags "$TOOLSDIR/$TYPE/payload${FRAMEWORKDIR}/Python3.framework/Versions/${PYTHON_BIN_VERSION}/Resources/Python.app"
   /usr/bin/codesign --sign "$3" --timestamp --options=runtime --force --preserve-metadata=identifier,entitlements,flags "$TOOLSDIR/$TYPE/payload${FRAMEWORKDIR}/Python3.framework/Versions/${PYTHON_BIN_VERSION}/Python"
@@ -253,8 +259,10 @@ else
   /usr/bin/find "$TOOLSDIR/$TYPE/payload${FRAMEWORKDIR}/Python3.framework/Versions/${PYTHON_BIN_VERSION}/lib" -type f -perm -u=x -exec /usr/bin/codesign -s - --options=runtime --preserve-metadata=identifier,entitlements,flags -f {} \;
   /usr/bin/find "$TOOLSDIR/$TYPE/payload${FRAMEWORKDIR}/Python3.framework/Versions/${PYTHON_BIN_VERSION}/lib" -type f -name "*dylib" -exec /usr/bin/codesign -s - --options=runtime --preserve-metadata=identifier,entitlements,flags -f {} \;
   if [ -d "$NESTED_FRAMEWORKS_DIR" ]; then
-    /usr/bin/find "$NESTED_FRAMEWORKS_DIR" -type f -perm -u=x -exec /usr/bin/codesign -s - --options=runtime --force {} \;
-    /usr/bin/find "$NESTED_FRAMEWORKS_DIR" -type f -name "*dylib" -exec /usr/bin/codesign -s - --options=runtime --force {} \;
+    for nested_fw in "$NESTED_FRAMEWORKS_DIR"/*.framework; do
+      [ -d "$nested_fw" ] || continue
+      /usr/bin/codesign -s - --options=runtime --force --deep "$nested_fw"
+    done
   fi
   /usr/bin/codesign -s - --options=runtime --deep --force --preserve-metadata=identifier,entitlements,flags "$TOOLSDIR/$TYPE/payload${FRAMEWORKDIR}/Python3.framework/Versions/${PYTHON_BIN_VERSION}/Resources/Python.app"
   /usr/bin/codesign -s - --options=runtime --force --preserve-metadata=identifier,entitlements,flags "$TOOLSDIR/$TYPE/payload${FRAMEWORKDIR}/Python3.framework/Versions/${PYTHON_BIN_VERSION}/Python"
