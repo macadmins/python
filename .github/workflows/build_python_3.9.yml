@@ -75,14 +75,17 @@ jobs:
             The python org [does not provide macOS packages for Python 3.9.14 and higher](https://www.python.org/downloads/release/python-3914/). This means that this project cannot use the most recent version of Python 3.9 with all security updates. Proceed with caution when using this release.
             
             > According to the release calendar specified in PEP 596, Python 3.9 is now in the "security fixes only" stage of its life cycle: the 3.9 branch only accepts security fixes and releases of those are made irregularly in source-only form until October 2025. Python 3.9 isn't receiving regular bug fixes anymore, and binary installers are no longer provided for it. Python 3.9.13 was the last full bugfix release of Python 3.9 with binary installers.
-            
+
+            ## Final Release
+            **This is the final release of the Python 3.9 framework.** Python 3.9 reached end-of-life in October 2025 and python.org has not published a macOS installer past 3.9.13. Future framework updates will target Python 3.11 and newer. Plan your migration.
+
             ${{ steps.changelog.outputs.changelog }}
 
             # Flavors of Python
             At this time, the automated build process will **only** create the Recommended package
 
             ## Recommended
-            This is a Python.framework that contains everything from minimal, and a few libraries that various well known open source projects require.
+            This is a Python.framework with a recommended set of libraries for tools like Autopkg, Munki, and InstallApplications.
 
             ## Signing/Notarization
             The signed package is fully notarized, including the Python.framework file

@@ -39,6 +39,7 @@ jobs:
 
     - name: Run build package script
       run: ./build_python_framework_pkgs.zsh "$TYPE" "$DEV_INSTALLER_ID" "$DEV_APPLICATION_ID" "$PYTHON_VERSION" "$PYTHON_MAJOR_VERSION" "${NOTARY_APP_PASSWORD}"
+          --xcode-path "/Applications/Xcode_15.2.app"
 
     - name: get environment variables
       id: get_env_var
@@ -75,14 +76,17 @@ jobs:
             The python org [does not provide macOS packages for Python 3.10.12 and higher](https://www.python.org/downloads/release/python-31012/). This means that this project cannot use the most recent version of Python 3.10 with all security updates. Proceed with caution when using this release.
             
             > According to the release calendar specified in PEP 619, Python 3.10 is now in the "security fixes only" stage of its life cycle: the 3.10 branch only accepts security fixes and releases of those are made irregularly in source-only form until October 2026. Python 3.10 isn't receiving regular bug fixes anymore, and binary installers are no longer provided for it. Python 3.10.11 was the last full bugfix release of Python 3.10 with binary installers.
-            
+
+            ## Final Release
+            **This is the final release of the Python 3.10 framework.** Python 3.10 is in security-fixes-only status and python.org has not published a macOS installer past 3.10.11. Future framework updates will target Python 3.11 and newer. Plan your migration.
+
             ${{ steps.changelog.outputs.changelog }}
 
             # Flavors of Python
             At this time, the automated build process will **only** create the Recommended package
 
             ## Recommended
-            This is a Python.framework that contains everything from minimal, and a few libraries that various well known open source projects require.
+            This is a Python.framework with a recommended set of libraries for tools like Autopkg, Munki, and InstallApplications.
 
             ## Signing/Notarization
             The signed package is fully notarized, including the Python.framework file

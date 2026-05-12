@@ -5,7 +5,7 @@ env:
   DEV_INSTALLER_ID: "Developer ID Installer: Mac Admins Open Source (T4SK8ZXCXG)"
   DEV_APPLICATION_ID: "Developer ID Application: Mac Admins Open Source (T4SK8ZXCXG)"
   NOTARY_APP_PASSWORD: ${{ secrets.NOTARY_APP_PASSWORD_MAOS }}
-  PYTHON_VERSION: "3.13.5"
+  PYTHON_VERSION: "3.13.13"
   PYTHON_MAJOR_VERSION: "3.13"
 
 on:
@@ -66,18 +66,19 @@ jobs:
             Python ${{env.PYTHON_VERSION}} Framework
 
             ## Changes
-            - Upgraded Python to 3.13.5
+            - Upgraded Python to 3.13.13
             **Note: Some of these updates may have breaking changes. Always test your code before deploying to production!**
             
             Please see the `requirements_recommended.txt` for the current libraries being used.
             
-            ${{ steps.changelog.outputs.changelog }}
+            ## Final Release
+            **This is the final release of the Python 3.13 framework for Intel macs.** macOS 27 will ship without Intel support so please plan your migration soon.
 
             # Flavors of Python
             At this time, the automated build process will **only** create the Recommended package
 
             ## Recommended
-            This is a Python.framework that contains everything from minimal, and a few libraries that various well known open source projects require.
+            This is a Python.framework with a recommended set of libraries for tools like Autopkg, Munki, and InstallApplications.
 
             ## Signing/Notarization
             The signed package is fully notarized, including the Python.framework file

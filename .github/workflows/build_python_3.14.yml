@@ -1,12 +1,12 @@
-name: Build Python 3.12
+name: Build Python 3.14
 
 env:
   TYPE: "recommended"
   DEV_INSTALLER_ID: "Developer ID Installer: Mac Admins Open Source (T4SK8ZXCXG)"
   DEV_APPLICATION_ID: "Developer ID Application: Mac Admins Open Source (T4SK8ZXCXG)"
   NOTARY_APP_PASSWORD: ${{ secrets.NOTARY_APP_PASSWORD_MAOS }}
-  PYTHON_VERSION: "3.12.10"
-  PYTHON_MAJOR_VERSION: "3.12"
+  PYTHON_VERSION: "3.14.5"
+  PYTHON_MAJOR_VERSION: "3.14"
 
 on:
   workflow_dispatch:
@@ -38,7 +38,13 @@ jobs:
         p12-password: ${{ secrets.PKG_CERTIFICATES_P12_PASSWORD_MAOS }}
 
     - name: Run build package script
-      run: ./build_python_framework_pkgs.zsh "$TYPE" "$DEV_INSTALLER_ID" "$DEV_APPLICATION_ID" "$PYTHON_VERSION" "$PYTHON_MAJOR_VERSION" "${NOTARY_APP_PASSWORD}"
+      run: |
+        ./build_python_framework_pkgs.zsh \
+          --python-version "$PYTHON_VERSION" \
+          --installer-id "$DEV_INSTALLER_ID" \
+          --application-id "$DEV_APPLICATION_ID" \
+          --notary-password "$NOTARY_APP_PASSWORD" \
+          --xcode-path "/Applications/Xcode_15.2.app"
 
     - name: get environment variables
       id: get_env_var
@@ -66,13 +72,15 @@ jobs:
             Python ${{env.PYTHON_VERSION}} Framework
 
             ## Changes
-            - Upgraded Python to 3.12.10
+            - Upgraded Python to 3.14.5
             **Note: Some of these updates may have breaking changes. Always test your code before deploying to production!**
             
             Please see the `requirements_recommended.txt` for the current libraries being used.
             
             ## Final Release
-            **This is the final release of the Python 3.12 framework for Intel macs.** macOS 27 will ship without Intel support so please plan your migration soon.
+            **This is the final release of the Python 3.14 framework for Intel macs.** macOS 27 will ship without Intel support so please plan your migration soon.
+
+            ${{ steps.changelog.outputs.changelog }}
 
             # Flavors of Python
             At this time, the automated build process will **only** create the Recommended package
