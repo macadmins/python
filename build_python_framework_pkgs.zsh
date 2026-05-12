@@ -197,6 +197,8 @@ build_pkg() {
 JSON
 
     "${MP_BINDIR}/munki-pkg-${MP_SHA}/munkipkg" "$TOOLSDIR/$TYPE"
+    local pkg_built="$TOOLSDIR/$TYPE/build/python_${TYPE}_signed-$AUTOMATED_PYTHON_BUILD.pkg"
+    /bin/mv "$pkg_built" "$OUTPUTSDIR"
 }
 
 notarize_and_staple() {
@@ -208,7 +210,7 @@ notarize_and_staple() {
     xcode_dev="$(/usr/bin/xcode-select -p)"
     xcode_notary="$xcode_dev/usr/bin/notarytool"
     xcode_stapler="$xcode_dev/usr/bin/stapler"
-    pkg="$TOOLSDIR/$TYPE/build/python_${TYPE}_signed-$AUTOMATED_PYTHON_BUILD.pkg"
+    pkg="$OUTPUTSDIR/python_${TYPE}_signed-$AUTOMATED_PYTHON_BUILD.pkg"
 
     "$xcode_notary" store-credentials \
         --apple-id "opensource@macadmins.io" \
@@ -217,7 +219,6 @@ notarize_and_staple() {
         macadminpython
     "$xcode_notary" submit "$pkg" --keychain-profile macadminpython --wait
     "$xcode_stapler" staple "$pkg"
-    /bin/mv "$pkg" "$OUTPUTSDIR"
 }
 
 zip_framework() {
