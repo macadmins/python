@@ -8,14 +8,6 @@ cfgv==3.5.0
 charset-normalizer==3.4.7
 click==8.3.3
 distlib==0.4.0
-attrs==25.3.0
-black==25.1.0
-certifi==2025.6.15
-cffi==1.17.1
-cfgv==3.4.0
-charset-normalizer==3.4.2
-click==8.2.1
-distlib==0.3.9
 docklib==2.0.0
 entrypoints==0.4
 filelock==3.29.0
