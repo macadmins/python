@@ -74,6 +74,8 @@ jobs:
             ## Final Release
             **This is the final release of the Python 3.13 framework for Intel macs.** macOS 27 will ship without Intel support so please plan your migration soon.
 
+            ${{ steps.changelog.outputs.changelog }}
+
             # Flavors of Python
             At this time, the automated build process will **only** create the Recommended package
 
