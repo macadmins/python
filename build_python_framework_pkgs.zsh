@@ -143,6 +143,7 @@ codesign_framework() {
     local identity="${APPLICATION_ID:--}"   # `-` means ad-hoc
     local framework_root="$TOOLSDIR/$TYPE/payload${FRAMEWORKDIR}/Python3.framework"
     local versioned="$framework_root/Versions/${PYTHON_BIN_VERSION}"
+    local nested_frameworks_dir="$versioned/Frameworks"
 
     if [[ "$identity" == "-" ]]; then
         echo "Ad-hoc signing framework"
@@ -150,11 +151,24 @@ codesign_framework() {
         echo "Signing framework with identity: $identity"
     fi
 
+    # Codesign notes:
+    #   - Use --options=runtime to force-enable hardened runtime (required for
+    #     notarization on macOS 13+). Do NOT include `runtime` in
+    #     --preserve-metadata: install_name_tool just invalidated the prior
+    #     signature, so there is nothing reliable to inherit.
+    #   - Do NOT sign Versions/Current/Python — it's a symlink to
+    #     Versions/X.Y/Python which we already signed. Double-signing through
+    #     the symlink corrupts the signature on newer Python frameworks.
+    #   - Sign nested .framework bundles (Tcl, Tk in Python 3.13+) with --deep,
+    #     not via per-binary find. The bundle's _CodeSignature/CodeResources
+    #     file must be regenerated to match the re-signed inner binary;
+    #     otherwise notarytool reports "nested code is modified or invalid".
+
     local -a cs_args
     if [[ "$identity" == "-" ]]; then
-        cs_args=(--preserve-metadata=identifier,entitlements,flags,runtime -f)
+        cs_args=(--options=runtime --preserve-metadata=identifier,entitlements,flags -f)
     else
-        cs_args=(--timestamp --preserve-metadata=identifier,entitlements,flags,runtime -f)
+        cs_args=(--timestamp --options=runtime --preserve-metadata=identifier,entitlements,flags -f)
     fi
 
     /usr/bin/find "$versioned/bin" -type f -perm -u=x -exec \
@@ -163,9 +177,21 @@ codesign_framework() {
         /usr/bin/codesign -s "$identity" "${cs_args[@]}" {} \;
     /usr/bin/find "$versioned/lib" -type f -name "*dylib" -exec \
         /usr/bin/codesign -s "$identity" "${cs_args[@]}" {} \;
+
+    if [[ -d "$nested_frameworks_dir" ]]; then
+        local nested_fw
+        for nested_fw in "$nested_frameworks_dir"/*.framework; do
+            [[ -d "$nested_fw" ]] || continue
+            if [[ "$identity" == "-" ]]; then
+                /usr/bin/codesign -s "$identity" --options=runtime --force --deep "$nested_fw"
+            else
+                /usr/bin/codesign -s "$identity" --timestamp --options=runtime --force --deep "$nested_fw"
+            fi
+        done
+    fi
+
     /usr/bin/codesign -s "$identity" --deep "${cs_args[@]}" "$versioned/Resources/Python.app"
     /usr/bin/codesign -s "$identity" "${cs_args[@]}" "$versioned/Python"
-    /usr/bin/codesign -s "$identity" "${cs_args[@]}" "$framework_root/Versions/Current/Python"
 
     /usr/sbin/spctl -a -vvvv "$versioned/Python" || true
 }
