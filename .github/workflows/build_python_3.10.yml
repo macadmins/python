@@ -38,7 +38,12 @@ jobs:
         p12-password: ${{ secrets.PKG_CERTIFICATES_P12_PASSWORD_MAOS }}
 
     - name: Run build package script
-      run: ./build_python_framework_pkgs.zsh "$TYPE" "$DEV_INSTALLER_ID" "$DEV_APPLICATION_ID" "$PYTHON_VERSION" "$PYTHON_MAJOR_VERSION" "${NOTARY_APP_PASSWORD}"
+      run: |
+        ./build_python_framework_pkgs.zsh \
+          --python-version "$PYTHON_VERSION" \
+          --installer-id "$DEV_INSTALLER_ID" \
+          --application-id "$DEV_APPLICATION_ID" \
+          --notary-password "$NOTARY_APP_PASSWORD" \
           --xcode-path "/Applications/Xcode_15.2.app"
 
     - name: get environment variables
