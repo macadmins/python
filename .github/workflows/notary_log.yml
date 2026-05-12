@@ -1,0 +1,24 @@
+name: Fetch notary log
+
+on:
+  workflow_dispatch:
+    inputs:
+      submission_id:
+        description: "Notarization submission UUID"
+        required: true
+        type: string
+
+jobs:
+  log:
+    runs-on: macos-latest
+
+    steps:
+    - name: Fetch notary log
+      env:
+        SUBMISSION_ID: ${{ inputs.submission_id }}
+        NOTARY_APP_PASSWORD: ${{ secrets.NOTARY_APP_PASSWORD_MAOS }}
+      run: |
+        xcrun notarytool log "$SUBMISSION_ID" \
+          --apple-id "opensource@macadmins.io" \
+          --team-id "T4SK8ZXCXG" \
+          --password "$NOTARY_APP_PASSWORD"
