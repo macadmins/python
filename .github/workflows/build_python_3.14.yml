@@ -64,15 +64,13 @@ jobs:
         body: |
             # Notes
             Python ${{env.PYTHON_VERSION}} Framework
+            Python 3.14.5 Framework
 
             ## Changes
             - Upgraded Python to 3.14.5
             **Note: Some of these updates may have breaking changes. Always test your code before deploying to production!**
-            
+
             Please see the `requirements_recommended.txt` for the current libraries being used.
-            
-            ## Final Release
-            **This is the final release of the Python 3.14 framework for Intel macs.** macOS 27 will ship without Intel support so please plan your migration soon.
 
             ${{ steps.changelog.outputs.changelog }}
 
