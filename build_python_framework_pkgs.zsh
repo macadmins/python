@@ -156,6 +156,9 @@ fi
 if [[ "${PYTHON_MAJOR_VERSION}" == "3.13" ]]; then
   /bin/ln -s "$PYTHON_BIN_NEW" "$TOOLSDIR/$TYPE/payload/usr/local/bin/managed_python3"
 fi
+if [[ "${PYTHON_MAJOR_VERSION}" == "3.14" ]]; then
+  /bin/ln -s "$PYTHON_BIN_NEW" "$TOOLSDIR/$TYPE/payload/usr/local/bin/managed_python3"
+fi
 
 SB_RESULT="$?"
 if [ "${SB_RESULT}" != "0" ]; then
