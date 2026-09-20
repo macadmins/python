@@ -14,7 +14,7 @@ filelock==3.29.0
 flake8==7.3.0
 flake8-bugbear==25.11.29
 identify==2.6.19
-idna==3.14
+idna==3.15
 isort==8.0.1
 mccabe==0.7.0
 mypy-extensions==1.1.0
