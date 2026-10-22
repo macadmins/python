@@ -47,10 +47,28 @@ Not supported.
 Build an unsigned framework on Apple Silicon with:
 
 ```
-./build_python_framework_pkgs.zsh --python-version 3.13.13
+./build_python_framework_pkgs.zsh --python-version 3.13.17
 ```
 
 Pass `--installer-id`, `--application-id`, and `--notary-password` to produce a signed and notarized `.pkg`.
+
+The build bootstraps pip 26.2.2 from a SHA-256-verified wheel before accessing
+PyPI, updates the pip bundled with `ensurepip`, and installs certifi 2026.10.19
+and virtualenv 21.14.13. These updates address the
+[eMudhra/emSign certificate security incident](https://discuss.python.org/t/109576)
+for the framework and newly created Python 3.11–3.14 virtual environments.
+Python 3.13 and 3.14 builds use the updated 3.13.17 and 3.14.9 installers;
+3.11 and 3.12 retain their last upstream macOS installers with patched `ensurepip`.
+
+Before packaging, the build verifies package dependencies, CA stores, offline
+`venv` and `virtualenv` creation, and HTTPS access through the standard library
+and Requests. Pull requests build and notarize packages; publishing a release
+requires a manual workflow run.
+
+Existing virtual environments have their own copies of pip and certifi and must
+be updated separately using the advisory's instructions. Python 3.9 is outside
+this framework's supported versions; virtualenv's compatibility seed for that
+version does not include the fixed pip.
 
 # Updating packages
 Do this in a clean virtual environment. After every Python package install, run `pip freeze | xargs pip uninstall -y` to reset the environment.
