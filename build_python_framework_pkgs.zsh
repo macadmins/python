@@ -231,6 +231,7 @@ codesign_framework() {
     /usr/bin/codesign -s "$identity" --deep "${cs_args[@]}" "$versioned/Resources/Python.app"
     /usr/bin/codesign -s "$identity" "${cs_args[@]}" "$versioned/Python"
 
+    /usr/bin/codesign --verify --deep --strict --verbose=2 "$framework_root"
     /usr/sbin/spctl -a -vvvv "$versioned/Python" || true
 }
 
@@ -313,10 +314,12 @@ download_tool munki-pkg "$MP_SHA" \
     "$MP_ZIP" "$MP_BINDIR"
 build_framework
 install_sitecustomize
-codesign_framework
+# Runtime checks can create bytecode caches in the framework. Finish all such
+# writes before signing so they cannot invalidate its sealed resources.
 /usr/bin/env -u SSL_CERT_FILE -u SSL_CERT_DIR \
     "$TOOLSDIR/$TYPE/payload${FRAMEWORKDIR}/Python3.framework/Versions/${PYTHON_BIN_VERSION}/bin/python${PYTHON_BIN_VERSION}" \
     -I "${TOOLSDIR}/verify_framework.py"
+codesign_framework
 build_pkg
 notarize_and_staple
 zip_framework
