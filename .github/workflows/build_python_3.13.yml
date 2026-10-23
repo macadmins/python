@@ -5,7 +5,7 @@ env:
   DEV_INSTALLER_ID: "Developer ID Installer: Mac Admins Open Source (T4SK8ZXCXG)"
   DEV_APPLICATION_ID: "Developer ID Application: Mac Admins Open Source (T4SK8ZXCXG)"
   NOTARY_APP_PASSWORD: ${{ secrets.NOTARY_APP_PASSWORD_MAOS }}
-  PYTHON_VERSION: "3.13.13"
+  PYTHON_VERSION: "3.13.17"
   PYTHON_MAJOR_VERSION: "3.13"
 
 on:
@@ -51,6 +51,7 @@ jobs:
          echo "PYTHON_BUILD_VERSION=$(/bin/cat ./build_info.txt)" >> $GITHUB_ENV
 
     - name: Generate changelog
+      if: github.event_name == 'workflow_dispatch'
       id: changelog
       uses: metcalfc/changelog-generator@0440d0932f9a0dd1cc9ecd8412830761351323bd # v4.7.0
       with:
@@ -58,6 +59,7 @@ jobs:
         reverse: 'true'
 
     - name: Create Release
+      if: github.event_name == 'workflow_dispatch'
       id: create_release
       uses: softprops/action-gh-release@b4309332981a82ec1c5618f44dd2e27cc8bfbfda # v3.0.0
       with:
@@ -71,7 +73,7 @@ jobs:
             Python ${{env.PYTHON_VERSION}} Framework
 
             ## Changes
-            - Upgraded Python to 3.13.13
+            - Upgraded Python to 3.13.17
             **Note: Some of these updates may have breaking changes. Always test your code before deploying to production!**
             
             Please see the `requirements_recommended.txt` for the current libraries being used.

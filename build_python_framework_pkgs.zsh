@@ -11,6 +11,10 @@ set -eu
 # --- Pinned upstream commits ---
 RP_SHA="8ee72fe3a5dbef733365370ebf44f25022b895ef"  # gregneagle/relocatable-python
 MP_SHA="bbd07730d1b93ed3828246575ef5676bba74b5d1"  # munki/munki-pkg
+# Python security advisory: https://discuss.python.org/t/109576
+PIP_VERSION="26.2.2"
+PIP_SHA256="fd7f4dfa8190e014013b9f08f3e973f4e4c26ffd179a204895533a7254813a70"
+PIP_URL="https://files.pythonhosted.org/packages/3f/06/3e4420302363fbb71be3c7f35ce042f54bfca330e3e66b3a2e3c4cca579f/pip-${PIP_VERSION}-py3-none-any.whl"
 
 # --- Paths and constants ---
 TYPE="recommended"
@@ -131,9 +135,34 @@ build_framework() {
         --baseurl "${PYTHON_BASEURL}" \
         --python-version "${PYTHON_VERSION}" \
         --os-version 11 \
-        --upgrade-pip \
-        --pip-requirements "${TOOLSDIR}/requirements_${TYPE}.txt" \
+        --without-pip \
         --destination "${FRAMEWORKDIR}"
+
+    # The upstream helper installs wheel online with the installer-bundled pip
+    # before upgrading pip. Bootstrap a verified, fixed wheel offline instead.
+    local python_bin="${FRAMEWORKDIR}/Python.framework/Versions/${PYTHON_BIN_VERSION}/bin/python${PYTHON_BIN_VERSION}"
+    local pip_dir pip_wheel
+    pip_dir="$(/usr/bin/mktemp -d /tmp/macadmins-python-pip.XXXXXX)"
+    pip_wheel="${pip_dir}/pip-${PIP_VERSION}-py3-none-any.whl"
+    /usr/bin/curl -fL "$PIP_URL" -o "$pip_wheel"
+    echo "${PIP_SHA256}  ${pip_wheel}" | /usr/bin/shasum -a 256 -c -
+    "$python_bin" -I "${TOOLSDIR}/update_ensurepip.py" "$pip_wheel"
+    "$python_bin" -I -m ensurepip --upgrade --default-pip
+    "$python_bin" -I -m pip --isolated --disable-pip-version-check install \
+        --no-cache-dir wheel -r "${TOOLSDIR}/requirements_${TYPE}.txt"
+    /bin/rm -rf "$pip_dir"
+
+    # Installing extras above creates new console scripts after the helper's
+    # original relocation pass. Make their shebangs relocatable before moving.
+    /usr/bin/python3 -I - "$rp_extract" "${FRAMEWORKDIR}/Python.framework" "$PYTHON_BIN_VERSION" <<'PY'
+import sys
+
+sys.path.insert(0, sys.argv[1])
+from locallibs.fix import fix_script_shebangs
+
+if not fix_script_shebangs(sys.argv[2], sys.argv[3]):
+    raise SystemExit("Failed to relocate installed console scripts")
+PY
 
     /bin/mv "${FRAMEWORKDIR}/Python.framework" \
         "$TOOLSDIR/$TYPE/payload${FRAMEWORKDIR}/Python3.framework"
@@ -202,6 +231,7 @@ codesign_framework() {
     /usr/bin/codesign -s "$identity" --deep "${cs_args[@]}" "$versioned/Resources/Python.app"
     /usr/bin/codesign -s "$identity" "${cs_args[@]}" "$versioned/Python"
 
+    /usr/bin/codesign --verify --deep --strict --verbose=2 "$framework_root"
     /usr/sbin/spctl -a -vvvv "$versioned/Python" || true
 }
 
@@ -284,6 +314,11 @@ download_tool munki-pkg "$MP_SHA" \
     "$MP_ZIP" "$MP_BINDIR"
 build_framework
 install_sitecustomize
+# Runtime checks can create bytecode caches in the framework. Finish all such
+# writes before signing so they cannot invalidate its sealed resources.
+/usr/bin/env -u SSL_CERT_FILE -u SSL_CERT_DIR \
+    "$TOOLSDIR/$TYPE/payload${FRAMEWORKDIR}/Python3.framework/Versions/${PYTHON_BIN_VERSION}/bin/python${PYTHON_BIN_VERSION}" \
+    -I "${TOOLSDIR}/verify_framework.py"
 codesign_framework
 build_pkg
 notarize_and_staple
