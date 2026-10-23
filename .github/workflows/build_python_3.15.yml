@@ -1,0 +1,97 @@
+name: Build Python 3.15
+
+env:
+  TYPE: "recommended"
+  DEV_INSTALLER_ID: "Developer ID Installer: Mac Admins Open Source (T4SK8ZXCXG)"
+  DEV_APPLICATION_ID: "Developer ID Application: Mac Admins Open Source (T4SK8ZXCXG)"
+  NOTARY_APP_PASSWORD: ${{ secrets.NOTARY_APP_PASSWORD_MAOS }}
+  PYTHON_VERSION: "3.15.1"
+  PYTHON_MAJOR_VERSION: "3.15"
+
+on:
+  workflow_dispatch:
+  pull_request:
+
+jobs:
+  build:
+    runs-on: macos-26
+
+    steps:
+    - name: Checkout python repo
+      uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+      with:
+        fetch-depth: 0
+
+    - name: Install Apple Developer ID Application certificates
+      uses: apple-actions/import-codesign-certs@5142e029c445c10ffc7149d172e540235a065466 # v7.0.0
+      with:
+        keychain-password: ${{ github.run_id }}
+        p12-file-base64: ${{ secrets.APP_CERTIFICATES_P12_MAOS }}
+        p12-password: ${{ secrets.APP_CERTIFICATES_P12_PASSWORD_MAOS }}
+
+    - name: Install Apple Developer ID Installer certificates
+      uses: apple-actions/import-codesign-certs@5142e029c445c10ffc7149d172e540235a065466 # v7.0.0
+      with:
+        create-keychain: false # do not create a new keychain for this value
+        keychain-password: ${{ github.run_id }}
+        p12-file-base64: ${{ secrets.PKG_CERTIFICATES_P12_MAOS }}
+        p12-password: ${{ secrets.PKG_CERTIFICATES_P12_PASSWORD_MAOS }}
+
+    - name: Run build package script
+      run: |
+        ./build_python_framework_pkgs.zsh \
+          --python-version "$PYTHON_VERSION" \
+          --installer-id "$DEV_INSTALLER_ID" \
+          --application-id "$DEV_APPLICATION_ID" \
+          --notary-password "$NOTARY_APP_PASSWORD"
+
+    - name: get environment variables
+      id: get_env_var
+      run: |
+         echo "PYTHON_BUILD_VERSION=$(/bin/cat ./build_info.txt)" >> $GITHUB_ENV
+
+    - name: Generate changelog
+      if: github.event_name == 'workflow_dispatch'
+      id: changelog
+      uses: metcalfc/changelog-generator@0440d0932f9a0dd1cc9ecd8412830761351323bd # v4.7.0
+      with:
+        myToken: ${{ secrets.GITHUB_TOKEN }}
+        reverse: 'true'
+
+    - name: Create Release
+      if: github.event_name == 'workflow_dispatch'
+      id: create_release
+      uses: softprops/action-gh-release@b4309332981a82ec1c5618f44dd2e27cc8bfbfda # v3.0.0
+      with:
+        name: Python ${{env.PYTHON_BUILD_VERSION}}
+        tag_name: v${{env.PYTHON_BUILD_VERSION}}
+        draft: false
+        prerelease: true
+        token: ${{ secrets.GITHUB_TOKEN }}
+        body: |
+            # Notes
+            Python ${{env.PYTHON_VERSION}} Framework
+
+            ## Changes
+            - Upgraded Python to 3.15.1
+            **Note: Some of these updates may have breaking changes. Always test your code before deploying to production!**
+
+            Please see the `requirements_recommended.txt` for the current libraries being used.
+
+            ${{ steps.changelog.outputs.changelog }}
+
+            # Flavors of Python
+            At this time, the automated build process will **only** create the Recommended package
+
+            ## Recommended
+            This is a Python.framework with a recommended set of libraries for tools like Autopkg, Munki, and InstallApplications.
+
+            ## Signing/Notarization
+            The signed package is fully notarized, including the Python.framework file
+        files: ${{github.workspace}}/outputs/*.pkg
+
+    - name: Upload packages
+      uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+      with:
+        name: packages
+        path: outputs/

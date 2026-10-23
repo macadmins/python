@@ -8,6 +8,10 @@ This is an intended replacement for `/usr/bin/python`, which Apple removed in ma
 ## Apple Silicon Only
 Builds and packages target Apple Silicon (arm64). Universal2 outputs are no longer produced. Build hosts and target machines must be Apple Silicon Macs.
 
+CI builds Python 3.11.9, 3.12.10, 3.13.17, 3.14.9, and 3.15.1 with the shared
+recommended dependencies, including PyObjC 12.2.2 and CFFI 2.1.1 for Python
+3.15 compatibility.
+
 ## Why use this instead of a package from python.org?
 - Ships with PyObjC and other modules useful for Mac admins, similar in spirit to the Apple Python it replaces
 - Installs to a location less likely to be overwritten, removed, or modified by other Python installations
@@ -47,7 +51,7 @@ Not supported.
 Build an unsigned framework on Apple Silicon with:
 
 ```
-./build_python_framework_pkgs.zsh --python-version 3.13.17
+./build_python_framework_pkgs.zsh --python-version 3.15.1
 ```
 
 Pass `--installer-id`, `--application-id`, and `--notary-password` to produce a signed and notarized `.pkg`.
@@ -56,8 +60,8 @@ The build bootstraps pip 26.2.2 from a SHA-256-verified wheel before accessing
 PyPI, updates the pip bundled with `ensurepip`, and installs certifi 2026.10.19
 and virtualenv 21.14.13. These updates address the
 [eMudhra/emSign certificate security incident](https://discuss.python.org/t/109576)
-for the framework and newly created Python 3.11–3.14 virtual environments.
-Python 3.13 and 3.14 builds use the updated 3.13.17 and 3.14.9 installers;
+for the framework and newly created Python 3.11–3.15 virtual environments.
+Python 3.13, 3.14, and 3.15 builds use the 3.13.17, 3.14.9, and 3.15.1 installers;
 3.11 and 3.12 retain their last upstream macOS installers with patched `ensurepip`.
 
 Before packaging, the build verifies package dependencies, CA stores, offline

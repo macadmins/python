@@ -11,10 +11,12 @@ import urllib.request
 from pathlib import Path
 
 import certifi
+import cffi
 import objc
 import requests
 import xattr
 import yaml
+from Foundation import NSObject
 from packaging.version import Version
 
 
@@ -50,6 +52,20 @@ def check_context(context):
 
 def main():
     print(f"Verifying framework: {sys.version}", flush=True)
+    # Exercise native extensions as well as their package metadata. This also
+    # covers source builds when wheels are not yet available for a new Python.
+    if cffi.FFI().sizeof("int") != 4:
+        raise RuntimeError("CFFI native extension check failed")
+    if NSObject.alloc().init() is None:
+        raise RuntimeError("PyObjC Foundation bridge check failed")
+    if yaml.safe_load("enabled: true") != {"enabled": True}:
+        raise RuntimeError("PyYAML check failed")
+    with tempfile.NamedTemporaryFile(prefix="macadmins-xattr-verify-") as temporary:
+        attributes = xattr.xattr(temporary.name)
+        attributes["io.macadmins.python.verify"] = b"working"
+        if attributes["io.macadmins.python.verify"] != b"working":
+            raise RuntimeError("xattr native extension check failed")
+    print("Verified CFFI, PyObjC, PyYAML, and xattr", flush=True)
     for package, minimum in (("certifi", "2026.10.19"), ("pip", "26.2.2")):
         version = importlib.metadata.version(package)
         if Version(version) < Version(minimum):
@@ -65,6 +81,7 @@ def main():
     # Exercise relocated console scripts as well as python -m entry points.
     run(str(Path(sys.prefix) / "bin/pip"), "--version")
     run(str(Path(sys.prefix) / "bin/virtualenv"), "--version")
+    run(str(Path(sys.prefix) / "bin/black"), "--version")
 
     with tempfile.TemporaryDirectory(prefix="macadmins-python-verify-") as temporary:
         root = Path(temporary)
