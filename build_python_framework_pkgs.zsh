@@ -10,7 +10,7 @@ set -eu
 
 # --- Pinned upstream commits ---
 RP_SHA="8ee72fe3a5dbef733365370ebf44f25022b895ef"  # gregneagle/relocatable-python
-MP_SHA="bbd07730d1b93ed3828246575ef5676bba74b5d1"  # munki/munki-pkg
+MP_SHA="7d57d0750bd6787838322b7abf02693da033d584"  # munki/munki-pkg
 # Python security advisory: https://discuss.python.org/t/109576
 PIP_VERSION="26.2.2"
 PIP_SHA256="fd7f4dfa8190e014013b9f08f3e973f4e4c26ffd179a204895533a7254813a70"
